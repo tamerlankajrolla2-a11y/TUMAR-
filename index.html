@@ -469,7 +469,7 @@ textarea.inp{min-height:84px;resize:vertical}
       <a class="btn btn--gold" href="#book">Забронировать</a>
     </nav>
     <a class="icon-btn hdr__call" href="tel:+77083640133" aria-label="Позвонить в ресторан"><svg><use href="#i-phone"/></svg></a>
-    <button class="icon-btn hdr__burger" id="burger" type="button" aria-label="Открыть меню разделов" aria-expanded="false" aria-controls="nav"><svg><use href="#i-burger"/></svg></button>
+    <button type="button" data-sm-open aria-label="Настройки"></button><button class="icon-btn hdr__burger" id="burger" type="button" aria-label="Открыть меню разделов" aria-expanded="false" aria-controls="nav"><svg><use href="#i-burger"/></svg></button>
   </div>
 </header>
 <div class="notice" id="notice" role="status" hidden></div>
@@ -1179,5 +1179,6 @@ if (document.readyState === 'complete') setTimeout(startVideo, 200); else addEve
 })();
 
 </script>
+<script src="sm.js" defer data-accent="#f0a91c" data-admin="admin.html"></script>
 </body>
 </html>
