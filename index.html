@@ -704,7 +704,8 @@ textarea.inp{min-height:84px;resize:vertical}
 
 /* ===== НАСТРОЙКИ ===== */
 const CFG = {
-  api: '',                         // адрес сервера бронирований (Cloudflare Worker), например 'https://tumar-booking.ВАШ-АККАУНТ.workers.dev'
+  sbUrl: "",                       // Supabase → Project URL, например 'https://xxxx.supabase.co'
+  sbKey: "",                       // Supabase → anon / publishable key (публичный, его можно держать в коде)
   wa: '77775958796',               // WhatsApp администратора (только цифры, с 7 в начале)
   phone: '+77083640133',
   phoneTxt: '+7 708 364 01 33',
@@ -741,6 +742,9 @@ const WD = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 const MON = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 const dLong = d => { const [y, m, dd] = d.split('-').map(Number); const w = new Date(Date.UTC(y, m - 1, dd)).getUTCDay(); return `${dd} ${MON[m - 1]}, ${WD[w]}`; };
 const dShort = d => { const [y, m, dd] = d.split('-'); const w = new Date(Date.UTC(+y, m - 1, +dd)).getUTCDay(); return `${dd}.${m} (${WD[w]})`; };
+const SB = (CFG.sbUrl || '').replace(/\/+$/, '');
+const sb = (path, body) => fetch(`${SB}/rest/v1/${path}`, { method: body ? 'POST' : 'GET', cache: 'no-store', headers: { apikey: CFG.sbKey, Authorization: 'Bearer ' + CFG.sbKey, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined })
+  .then(async r => { const j = await r.json().catch(() => null); if (!r.ok) throw new Error((j && j.message) || 'HTTP ' + r.status); return j; });
 const waLink = text => `https://wa.me/${CFG.wa}?text=${encodeURIComponent(text)}`;
 let tT; const toast = t => { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => el.classList.remove('on'), 3200); };
 
@@ -766,7 +770,7 @@ $('#map2gis').href = 'https://2gis.kz/search/' + encodeURIComponent(CFG.map);
 $('#mapYa').href = 'https://yandex.kz/maps/?text=' + encodeURIComponent(CFG.map);
 $('#mapReview').href = 'https://2gis.kz/search/' + encodeURIComponent(CFG.map);
 $('#yr').textContent = new Date().getFullYear();
-if (CFG.api) { const a = $('#adminLink'); a.href = CFG.api.replace(/\/+$/, '') + '/admin'; a.hidden = false; }
+if (SB) { const a = $('#adminLink'); a.href = 'admin.html'; a.hidden = false; }
 $('#eventsList').innerHTML = EVENTS.map(e => `<li>${esc(e)}</li>`).join('');
 
 /* ===== меню ===== */
@@ -913,14 +917,12 @@ function fmtPhone(v) {
 }
 
 /* ===== календарь и бронь ===== */
-const bk = { kind: 'banquet', date: null, busy: new Set(), month: todayKZ().slice(0, 7), today: todayKZ(), state: CFG.api ? 'loading' : 'off' };
+const bk = { kind: 'banquet', date: null, busy: new Set(), month: todayKZ().slice(0, 7), today: todayKZ(), state: SB ? 'loading' : 'off' };
 async function loadBusy() {
-  if (!CFG.api) { renderCal(); return; }
+  if (!SB) { renderCal(); return; }
   try {
-    const r = await fetch(`${CFG.api.replace(/\/+$/, '')}/api/availability?from=${bk.today}&to=${addDays(bk.today, 400)}`, { cache: 'no-store' });
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.error);
-    bk.busy = new Set(j.busy || []); if (j.today) bk.today = j.today; bk.state = 'ok';
+    const j = await sb('rpc/busy_dates', { d_from: bk.today, d_to: addDays(bk.today, 400) });
+    bk.busy = new Set((j || []).map(x => typeof x === 'string' ? x : x.busy_dates || Object.values(x)[0])); bk.state = 'ok';
   } catch (e) { bk.state = 'err'; }
   renderCal();
   if (bk.date && bk.busy.has(bk.date)) { toast('Выбранная дата уже занята — выберите другую'); bk.date = null; renderDate(); renderCal(); }
@@ -1008,13 +1010,12 @@ $('#form').addEventListener('submit', async e => {
   if (!$('#preBox').hidden && $('#fPre').checked) { p.preorder = cartLines().join('\n'); p.preorder_total = cartSum().sum || null; }
   store.set('tumar:me', { name: p.name, phone: p.phone });
 
-  if (!CFG.api) { window.open(waLink(bookingText(p)), '_blank', 'noopener'); showDone(p, null, 'wa'); return; }
+  if (!SB) { window.open(waLink(bookingText(p)), '_blank', 'noopener'); showDone(p, null, 'wa'); return; }
   const btn = $('#fSend'), old = btn.textContent; btn.disabled = true; btn.textContent = 'Отправляем…';
   try {
-    const r = await fetch(`${CFG.api.replace(/\/+$/, '')}/api/bookings`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) });
-    const j = await r.json().catch(() => ({}));
-    if (r.ok && j.ok) showDone(p, j.id, 'ok');
-    else if (r.status === 409) { bk.busy.add(p.date); bk.date = null; renderCal(); renderDate(); toast(j.error || 'Эта дата уже занята'); }
+    const j = await sb('rpc/create_booking', { p }) || {};
+    if (j.ok) showDone(p, j.id, 'ok');
+    else if (j.busy) { bk.busy.add(p.date); bk.date = null; renderCal(); renderDate(); toast(j.error || 'Эта дата уже занята'); }
     else toast(j.error || 'Не получилось отправить. Попробуйте ещё раз или напишите в WhatsApp.');
   } catch (err) { showDone(p, null, 'net'); }
   finally { btn.disabled = false; btn.textContent = old; }
@@ -1136,10 +1137,10 @@ $('#botForm').addEventListener('submit', e => { e.preventDefault(); const v = $(
 /* ===== данные с сервера (меню и объявление из админки) ===== */
 function validMenu(m) { return Array.isArray(m) && m.length && m.every(s => s && s.id && Array.isArray(s.cats) && s.cats.every(c => c && Array.isArray(c.items))); }
 async function loadSite() {
-  if (!CFG.api) return;
+  if (!SB) return;
   try {
-    const r = await fetch(`${CFG.api.replace(/\/+$/, '')}/api/site`, { cache: 'no-store' });
-    const j = await r.json(); if (!j.ok) return;
+    const rows = await sb('settings?select=key,value&key=in.(menu,notice)') || [];
+    const j = Object.fromEntries(rows.map(r => [r.key, r.value]));
     if (validMenu(j.menu)) { MENU = j.menu; indexMenu(); if (!MENU.some(s => s.id === st.tab)) st.tab = MENU[0].id; renderTabs(); renderMenu(); renderSig(); saveCart(); }
     if (j.notice && j.notice.on && j.notice.text) { const n = $('#notice'); n.textContent = j.notice.text; n.hidden = false; }
   } catch (e) { /* остаётся встроенное меню */ }

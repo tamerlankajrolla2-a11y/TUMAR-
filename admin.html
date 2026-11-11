@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0d3461">
+<title>Tumar — админка</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230d3461'/%3E%3Cg fill='none' stroke='%23e6c06d' stroke-width='3.4' stroke-linejoin='round' stroke-linecap='round'%3E%3Crect x='14' y='10' width='36' height='9' rx='4.5'/%3E%3Cpath d='M16 19H48L32 51Z'/%3E%3C/g%3E%3Ccircle cx='32' cy='29' r='3' fill='%23e6c06d'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#f7f1e4;--card:#fff;--ink:#1b2233;--mut:#6a6f7c;--line:#e7dbc2;--lz:#0d3461;--lz2:#15477f;--gold:#c79a3c;--gold2:#e6c06d;--ok:#1f7a4d;--okb:#e3f3e9;--new:#9a6a00;--newb:#fff2d2;--no:#b8262d;--nob:#fbe6e3;--tb:#2f7fc4;--tbb:#e4f0fb;--r:16px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.wrap{max-width:1000px;margin:0 auto;padding:0 14px 110px}
+.top{position:sticky;top:0;z-index:5;background:var(--lz);color:#fff;margin:0 -14px 14px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 8px 20px -14px rgba(0,0,0,.6)}
+.top .mark{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.1);display:grid;place-items:center;box-shadow:inset 0 0 0 1.5px rgba(230,192,109,.5)}
+.top h1{font:700 21px/1 Georgia,serif;letter-spacing:.04em;margin:0;color:var(--gold2)}
+.top small{color:rgba(255,255,255,.75);display:block;font:500 12.5px/1.2 system-ui;margin-top:3px}
+.top .sp{flex:1}
+.top .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff}
+.btn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;font-weight:600;display:inline-flex;align-items:center;gap:6px;min-height:42px;text-decoration:none;justify-content:center}
+.btn:hover{border-color:var(--gold)}
+.btn.gold{background:linear-gradient(180deg,var(--gold2),var(--gold));border-color:var(--gold);color:#2a1c05}
+.btn.lz{background:var(--lz);border-color:var(--lz);color:#fff}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.no{color:var(--no);border-color:#f0c8bf}
+.btn.sm{min-height:36px;padding:6px 11px;font-size:13.5px;border-radius:10px}
+.btn.wa{background:#1fa855;border-color:#1fa855;color:#fff}
+.btn:disabled{opacity:.5;cursor:default}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;border:1px solid var(--line);background:#fff;border-radius:99px;padding:9px 15px;font-weight:600;font-size:14px}
+.tabs button.on{background:var(--lz);color:#fff;border-color:var(--lz)}
+.tabs b{display:inline-block;min-width:20px;padding:0 6px;border-radius:99px;background:var(--newb);color:var(--new);font-size:12px;margin-left:4px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.inp{width:100%;min-height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:9px 12px;outline:none}
+.inp:focus{border-color:var(--gold)}
+.bar .inp{flex:1;min-width:160px;width:auto}
+.chk{display:inline-flex;gap:6px;align-items:center;font-size:14px;color:var(--mut);white-space:nowrap;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--lz)}
+.list{display:grid;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:10px;box-shadow:0 6px 20px -16px rgba(13,52,97,.45)}
+.card.new{border-left:5px solid #e6b33a}.card.confirmed{border-left:5px solid var(--ok)}.card.cancelled{border-left:5px solid #c9b8a6;opacity:.75}
+.ch{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.ch h3{margin:0;font:700 19px/1.25 Georgia,serif}
+.ch .id{color:var(--mut);font-size:13px;font-weight:600}
+.st{font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:99px;white-space:nowrap}
+.st.new{background:var(--newb);color:var(--new)}.st.confirmed{background:var(--okb);color:var(--ok)}.st.cancelled{background:#eee6da;color:var(--mut)}
+.kind{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;margin-right:6px;vertical-align:1px}
+.kind.banquet{background:#efe3c6;color:#7a5a17}.kind.table{background:var(--tbb);color:var(--tb)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 14px;font-size:14px}
+.grid span{color:var(--mut)}
+.who{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:10px;border-top:1px dashed var(--line)}
+.who b{font-size:16px;margin-right:auto}
+.cm{background:#fbf7ef;border-radius:10px;padding:8px 11px;font-size:14px;white-space:pre-wrap}
+details.pre{background:#f4f8fd;border:1px solid #d9e7f5;border-radius:10px;padding:8px 11px;font-size:14px}
+details.pre summary{cursor:pointer;font-weight:600;color:var(--lz2)}
+details.pre div{white-space:pre-wrap;margin-top:6px}
+.note{min-height:38px;font-size:14px;resize:vertical}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.meta{font-size:12px;color:var(--mut)}
+.empty{text-align:center;color:var(--mut);padding:40px 10px;background:#fff;border:1px dashed var(--line);border-radius:var(--r)}
+.cal{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.calh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.calh b{font:700 19px Georgia,serif;text-transform:capitalize}
+.cg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.cg .wd{text-align:center;font-size:12px;color:var(--mut);font-weight:700;padding:4px 0}
+.dc{min-height:64px;border:1px solid var(--line);border-radius:10px;padding:5px;font-size:12px;text-align:left;background:#fff;display:flex;flex-direction:column;gap:2px}
+.dc .n{font-weight:700;font-size:14px}
+.dc.past{opacity:.45}
+.dc.today{outline:2px solid var(--gold)}
+.dc.conf{background:var(--okb);border-color:#a8d5b8}
+.dc.blk{background:repeating-linear-gradient(45deg,#f1ebe0,#f1ebe0 6px,#fff 6px,#fff 12px)}
+.dc i{font-style:normal;font-size:11px;border-radius:6px;padding:0 4px;align-self:flex-start;white-space:nowrap}
+.dc i.c{background:var(--ok);color:#fff}.dc i.w{background:#e6b33a;color:#fff}.dc i.x{background:#8a7c66;color:#fff}.dc i.t{background:var(--tb);color:#fff}
+.dc.sel{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--mut);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px}
+.panel h2{margin:0;font:700 20px Georgia,serif;color:var(--lz)}
+.panel p.h{margin:0;color:var(--mut);font-size:13.5px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label.f{display:grid;gap:5px;font-size:13px;font-weight:600;color:var(--mut)}
+.blk-list{display:grid;gap:8px}
+.blk-list div{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+/* меню */
+.seg{display:inline-flex;gap:4px;padding:4px;background:#efe5cf;border-radius:99px;margin-bottom:12px}
+.seg button{border:0;background:transparent;border-radius:99px;padding:8px 14px;font-weight:600;font-size:14px;color:var(--mut)}
+.seg button.on{background:var(--lz);color:#fff}
+.mc{background:#fff;border:1px solid var(--line);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.mc>summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:10px;font:700 17px Georgia,serif;color:var(--lz);background:#fbf7ee}
+.mc>summary::-webkit-details-marker{display:none}
+.mc>summary::after{content:"▾";margin-left:auto;color:var(--mut);transition:.2s}
+.mc[open]>summary::after{transform:rotate(180deg)}
+.mc>summary small{font:600 12.5px system-ui;color:var(--mut)}
+.mcb{padding:8px 12px 12px;display:grid;gap:8px}
+.mi{display:grid;grid-template-columns:1fr 120px 104px auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.mi.off{background:#f6f2ea}
+.mi.off .nm{text-decoration:line-through;color:var(--mut)}
+.mi .inp{min-height:40px;padding:7px 10px;font-size:14.5px}
+.mi .pr{text-align:right;font-weight:700}
+.mi .tg{display:flex;gap:6px;align-items:center;flex-wrap:wrap;grid-column:1/-1}
+.pill{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:99px;padding:5px 10px;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer;user-select:none;background:#fff}
+.pill input{width:16px;height:16px;margin:0;accent-color:var(--lz)}
+.pill.offp:has(input:checked){background:var(--nob);border-color:#f0c8bf;color:var(--no)}
+.pill.hitp:has(input:checked){background:#fdf0d5;border-color:#ebcf8d;color:#7a5a17}
+.mi .x{margin-left:auto;border:0;background:none;color:var(--no);font-weight:600;font-size:13px;padding:6px}
+.mi textarea{grid-column:1/-1;min-height:60px;font-size:13.5px}
+.mi .ph{font-size:11.5px;color:var(--mut)}
+.savebar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;align-items:center;justify-content:center;box-shadow:0 -10px 24px -18px rgba(13,52,97,.5);transform:translateY(110%);transition:.25s}
+.savebar.on{transform:none}
+.savebar span{font-weight:600;color:var(--new);white-space:nowrap}
+.savebar .btn{white-space:nowrap}
+.login{max-width:380px;margin:12vh auto 0;background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px;display:grid;gap:14px;text-align:center}
+.login .mark{width:64px;height:64px;border-radius:18px;background:var(--lz);display:grid;place-items:center;margin:0 auto}
+.login h1{margin:0;font:700 26px Georgia,serif;letter-spacing:.06em;color:var(--lz)}
+.login p{margin:0;color:var(--mut)}
+.err{color:var(--no);font-size:14px;min-height:20px}
+.prev{background:#b8262d;color:#fff;text-align:center;padding:10px 14px;border-radius:12px;font-weight:600}
+.toast{position:fixed;left:50%;bottom:84px;transform:translate(-50%,30px);opacity:0;background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;transition:.3s;pointer-events:none;z-index:9;max-width:calc(100% - 30px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+[hidden]{display:none!important}
+@media (max-width:640px){.fr{grid-template-columns:1fr}.dc{min-height:54px;padding:3px}.dc i{font-size:10px;padding:0 3px}.top h1{font-size:19px}
+  .mi{grid-template-columns:1fr 96px}.mi .nm{grid-column:1/-1}.mi .un{grid-column:auto}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="am" viewBox="0 0 60 70"><g fill="none" stroke="#e6c06d" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"><rect x="9" y="5" width="42" height="10" rx="5"/><path d="M12 15H48L30 53Z"/><path d="M21.5 21H38.5L30 39Z" stroke-width="2.2"/><path d="M30 53v4"/></g><circle cx="30" cy="62" r="4.2" fill="#e6c06d"/><circle cx="30" cy="27.5" r="2.3" fill="#e6c06d"/></symbol></svg>
+
+<div id="login" class="login" hidden>
+  <div class="mark"><svg width="36" height="42"><use href="#am"/></svg></div>
+  <h1>TUMAR</h1>
+  <p>Вход для администратора</p>
+  <input class="inp" id="em" type="email" placeholder="Почта администратора" autocomplete="username">
+  <input class="inp" id="pw" type="password" placeholder="Пароль" autocomplete="current-password">
+  <label class="chk" style="justify-content:center"><input type="checkbox" id="remember" checked> Запомнить на этом телефоне</label>
+  <button class="btn gold" id="loginBtn">Войти</button>
+  <div class="err" id="loginErr"></div>
+</div>
+
+<div id="app" class="wrap" hidden>
+  <div class="top">
+    <div class="mark"><svg width="24" height="28"><use href="#am"/></svg></div>
+    <div><h1>TUMAR</h1><small>Админка · <span id="todayTxt"></span></small></div>
+    <div class="sp"></div>
+    <button class="btn sm" id="reload" title="Обновить">↻</button>
+    <button class="btn sm" id="csv">⬇ Excel</button>
+    <button class="btn sm" id="logout">Выйти</button>
+  </div>
+  <div class="tabs" id="tabs">
+    <button data-tab="list" class="on">Заявки <b id="cntNew">0</b></button>
+    <button data-tab="cal">Календарь</button>
+    <button data-tab="menu">Меню и цены</button>
+    <button data-tab="block">Закрыть дату</button>
+    <button data-tab="add">+ Бронь вручную</button>
+    <button data-tab="notice">Объявление</button>
+  </div>
+
+  <section data-view="list">
+    <div class="bar">
+      <select class="inp" id="fStatus" style="flex:0 0 auto;width:auto">
+        <option value="new">Новые</option><option value="confirmed">Подтверждённые</option><option value="cancelled">Отменённые</option><option value="">Все</option>
+      </select>
+      <select class="inp" id="fKind" style="flex:0 0 auto;width:auto"><option value="">Банкеты и столики</option><option value="banquet">Только банкеты</option><option value="table">Только столики</option></select>
+      <input class="inp" id="fQ" type="search" placeholder="Поиск: имя, телефон, №">
+      <label class="chk"><input type="checkbox" id="fFuture" checked> только будущие</label>
+    </div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <section data-view="cal" hidden>
+    <div class="cal">
+      <div class="calh"><button class="btn sm" id="calPrev">←</button><b id="calTitle"></b><button class="btn sm" id="calNext">→</button></div>
+      <div class="cg" id="calGrid"></div>
+      <div class="legend"><span><i style="background:var(--okb);border:1px solid #a8d5b8"></i>подтверждён банкет (на сайте «занято»)</span><span><i style="background:var(--tb)"></i>столики</span><span><i style="background:#e6b33a"></i>новые заявки</span><span><i style="background:repeating-linear-gradient(45deg,#e4dccd,#e4dccd 3px,#fff 3px,#fff 6px)"></i>закрыта вручную</span></div>
+    </div>
+    <div id="dayBox" style="margin-top:14px"></div>
+  </section>
+
+  <section data-view="menu" hidden>
+    <div class="panel" style="margin-bottom:12px">
+      <h2>Меню и цены на сайте</h2>
+      <p class="h">Меняйте цены и названия, отмечайте «Нет сегодня» — блюдо станет серым и его нельзя будет заказать. После правок нажмите «Сохранить» внизу — сайт обновится сразу.</p>
+      <p class="h" id="menuState"></p>
+    </div>
+    <div class="seg" id="mSeg"></div>
+    <div id="mBody"></div>
+    <div class="acts" style="margin-top:6px"><button class="btn sm" id="mAddCat">+ Новый раздел</button><button class="btn sm no" id="mReset" style="margin-left:auto">Вернуть исходное меню</button></div>
+  </section>
+
+  <section data-view="block" hidden>
+    <div class="panel">
+      <h2>Закрыть дату</h2>
+      <p class="h">Закрытая дата сразу показывается на сайте как «занято». Для брони по телефону, своего мероприятия или выходного.</p>
+      <div class="fr"><label class="f">Дата<input class="inp" id="bDate" type="date"></label><label class="f">Причина (видно только вам)<input class="inp" id="bReason" placeholder="Например: бронь по телефону"></label></div>
+      <button class="btn gold" id="bSave">Закрыть дату</button>
+      <h2 style="margin-top:8px">Закрытые даты</h2>
+      <div class="blk-list" id="bList"></div>
+    </div>
+  </section>
+
+  <section data-view="add" hidden>
+    <div class="panel">
+      <h2>Бронь вручную</h2>
+      <p class="h">Для заказов, принятых по телефону. Подтверждённый банкет закрывает дату на сайте; столик — нет.</p>
+      <div class="fr"><label class="f">Тип<select class="inp" id="aKind"><option value="banquet">Банкет / той (весь день)</option><option value="table">Столик</option></select></label><label class="f">Праздник<select class="inp" id="aType"></select></label></div>
+      <div class="fr"><label class="f">Дата<input class="inp" id="aDate" type="date"></label><label class="f">Начало<input class="inp" id="aTime" type="time" value="18:00"></label></div>
+      <div class="fr"><label class="f">Гостей<input class="inp" id="aGuests" type="number" min="1" max="500" value="40"></label><label class="f">Телефон<input class="inp" id="aPhone" type="tel" placeholder="+7 7__ ___ __ __"></label></div>
+      <label class="f">Имя<input class="inp" id="aName"></label>
+      <label class="f">Комментарий (меню, детали)<textarea class="inp" id="aCom" rows="3"></textarea></label>
+      <label class="f">Статус<select class="inp" id="aStatus"><option value="confirmed">Подтверждена</option><option value="new">Новая</option></select></label>
+      <button class="btn gold" id="aSave">Сохранить бронь</button>
+    </div>
+  </section>
+
+  <section data-view="notice" hidden>
+    <div class="panel">
+      <h2>Объявление на сайте</h2>
+      <p class="h">Красная строка над сайтом. Например: «31 декабря работаем до 17:00» или «Сегодня в меню бешбармак».</p>
+      <label class="f">Текст (до 300 знаков)<textarea class="inp" id="nText" rows="3" maxlength="300"></textarea></label>
+      <label class="chk"><input type="checkbox" id="nOn"> Показывать на сайте</label>
+      <div class="prev" id="nPrev" hidden></div>
+      <button class="btn gold" id="nSave">Сохранить объявление</button>
+    </div>
+  </section>
+</div>
+<div class="savebar" id="saveBar"><span>Есть правки</span><button class="btn sm" id="mUndo">Отменить</button><button class="btn gold" id="mSave">Сохранить</button></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const CFG = { sbUrl: "", sbKey: "", email: "" };
+const SB = CFG.sbUrl.replace(/\/+$/, ''), KEY = CFG.sbKey;
+const MENU_DEFAULT = [{"id":"cafe","title":"Кафе — каждый день","note":"Горячие обеды, выпечка, пицца и суши. Можно поесть в зале или взять с собой.","cats":[{"id":"soup","t":"Первые блюда","items":[{"id":"borsch","n":"Борщ","p":800,"img":"borsch"},{"id":"pelmeni","n":"Пельмени с бульоном","p":800,"img":"pelmeni"},{"id":"solyanka","n":"Солянка мясная сборная","p":750,"img":"solyanka"},{"id":"lapsha","n":"Лапша домашняя","p":500,"img":"lapsha"},{"id":"rassolnik","n":"Рассольник","p":500,"img":"rassolnik"}]},{"id":"main","t":"Вторые блюда","items":[{"id":"thai","n":"Мясо по-тайски","p":2000,"img":"thai"},{"id":"lagman","n":"Лагман","p":1500,"img":"lagman"},{"id":"plov","n":"Плов","p":1300,"img":"plov"},{"id":"manty","n":"Манты","p":1500,"img":"manty"},{"id":"kotleta","n":"Котлета домашняя с гарниром","p":1500,"img":"kotleta"},{"id":"gulyash","n":"Гуляш с гарниром","p":1500,"img":"gulyash"}]},{"id":"salad","t":"Салаты","items":[{"id":"meri","n":"Мери","p":700,"img":"meri"},{"id":"morkov","n":"Морковь по-корейски","p":700,"u":"150 г","img":"morkov"},{"id":"ovoshnoy","n":"Овощной","p":700,"img":"ovoshnoy"},{"id":"narezka_c","n":"Овощная нарезка","p":700,"img":"narezka_c"}]},{"id":"bake","t":"Выпечка","items":[{"id":"samsa","n":"Самса","p":400,"img":"samsa","hit":true},{"id":"belyash","n":"Беляш","p":400,"img":"belyash"},{"id":"cheburek","n":"Чебурек","p":400,"img":"cheburek"},{"id":"sosiska","n":"Сосиска в тесте","p":350,"img":"sosiska"},{"id":"hotdog","n":"Хот-дог","p":300,"img":"hotdog"},{"id":"kurnik","n":"Курник","p":300,"img":"kurnik"},{"id":"pirog","n":"Пирог творожный","p":600,"u":"кусок","img":"pirog"},{"id":"bliny","n":"Блины со сгущёнкой","p":500,"u":"2 шт","img":"bliny"},{"id":"hleb","n":"Хлеб","p":30,"u":"1 шт","img":"hleb"}]},{"id":"pizza","t":"Пицца","items":[{"id":"pizza_slice","n":"Пицца кусочком","p":400,"u":"кусок","img":"pizza_slice"},{"id":"pz_assorti","n":"Пицца «Ассорти»","p":3600,"img":"pz_assorti"},{"id":"pz_chicken","n":"Пицца «Курица с сыром»","p":3500,"img":"pz_chicken"},{"id":"pz_kolbasa","n":"Пицца «С колбасой»","p":3500,"img":"pz_kolbasa"}]},{"id":"sushi","t":"Суши","items":[{"id":"philadelphia","n":"Филадельфия","p":4000,"img":"philadelphia"},{"id":"california","n":"Калифорния","p":3500,"img":"california"},{"id":"sake","n":"Сяке-маки","p":3500,"img":"sake"}]},{"id":"grill","t":"Шашлык и донер","items":[{"id":"okorochka","n":"Шашлык из окорочка","p":1700,"img":"okorochka"},{"id":"doner_beef","n":"Донер с говядиной","p":1200,"img":"doner_beef","hit":true},{"id":"doner","n":"Донер","p":1300,"img":"doner"},{"id":"fries","n":"Картошка фри","p":800,"u":"150 г","img":"fries"}]}]},{"id":"banket","title":"Банкетное меню","note":"Для тоев, юбилеев и праздников. Цена указана за блюдо; у некоторых блюд — на сколько человек. Где цены нет, её скажет администратор.","cats":[{"id":"hot","t":"Горячее","items":[{"id":"tumar","n":"Тумар","d":"Фирменное блюдо: запечённый картофель, жареные манты, рис, ризотто, говядина в специальном соусе и овощи","p":35000,"u":"на 12 человек","img":"tumar","hit":true},{"id":"beshbarmak","n":"Бешпармак с особым приготовлением","p":48000,"u":"на 12 человек","img":"beshbarmak","hit":true},{"id":"shashlyk_as","n":"Шашлычное ассорти и люля-кебаб","d":"Баранина — рёбра, говядина — филе, курица — крылышки; люля-кебаб, огурцы, помидоры, маринованный лук, запечённый картофель","p":22000,"u":"на 12 человек","img":"shashlyk_as","hit":true},{"id":"sirne","n":"Сірне","d":"Мясо с овощами: картофель, морковь, лук, болгарский перец, манты-розочки","p":null,"img":"sirne","hit":true},{"id":"karp","n":"Карп фаршированный запечённый","d":"С овощами","p":15000,"u":"на 10 человек","img":"karp"},{"id":"kur_as","n":"Куриное ассорти","d":"Голень, крылья, бедро","p":8000,"u":"на 12 человек","img":"kur_as"},{"id":"utka","n":"Утка жареная","d":"Овощи, зелень","p":null,"img":"utka"},{"id":"gus","n":"Гусь по-королевски","d":"С запечёнными овощами и фруктами на гриле, хрустящими картофельными шариками (брокколи, баклажан, груша, яблоко)","p":null,"img":"gus"},{"id":"rebra","n":"Тушёные рёбра в винном соусе","d":"Со стейками-медальонами, запечёнными картофельными дольками и овощами на гриле (цукини, перец, помидор, кабачок)","p":3500,"u":"порция","img":"rebra"},{"id":"sudak","n":"Судак запечённый в сливочно-чесночном соусе","d":"С грибами на гриле и тушёными овощами (морковь, лук, стручковая фасоль)","p":3500,"u":"порция","img":"sudak"},{"id":"red_fish","n":"Стейк из красной рыбы","p":4500,"img":"red_fish"},{"id":"morskoy","n":"Морской язык с овощами в духовке","p":null,"img":"morskoy"},{"id":"kur_file","n":"Куриное филе, фаршированное овощами","d":"Рулетики","p":4500,"img":"kur_file"},{"id":"otbivnoe","n":"Мясо отбивное с овощами и гарниром","p":3500,"img":"otbivnoe"},{"id":"steak","n":"Стейк из свинины","d":"Запечённый с овощами и картофелем","p":3500,"img":"steak"},{"id":"thai_b","n":"Мясо по-тайски","d":"Говядина, солёные огурцы, лук, морковь, болгарский перец, соевый соус","p":2500,"img":"thai_b"},{"id":"damlyama","n":"Дамляма","d":"Говяжьи рёбра, помидоры, капуста, болгарский перец, лук, морковь","p":2500,"img":"damlyama"},{"id":"zapekanka","n":"Запеканка с отбивным мясом и овощами","d":"Картошка, морковь, грибы, лук, майонез, сыр","p":2500,"u":"порция","img":"zapekanka"},{"id":"gusarchiki","n":"Гусарчики","d":"Котлета, картофельное пюре, грибы, овощи, сыр","p":null,"img":"gusarchiki"},{"id":"hinkali","n":"Хинкали на дрожжевом тесте","d":"Фарш, зелень, чеснок, лук","p":null,"img":"hinkali"},{"id":"manty_b","n":"Манты","p":null,"u":"за 1 шт","img":"manty_b"},{"id":"golubcy","n":"Голубцы","p":500,"u":"1 шт","img":"golubcy"},{"id":"shnicel","n":"Куриные шницели в панировке","p":null,"img":"shnicel"}]},{"id":"cold","t":"Холодные закуски","items":[{"id":"rulet_as","n":"Ассорти рулетов","d":"Рулет яичный (яйцо, мясной фарш), рулет морковный (морковь, майонез, плавленый сыр)","p":4500,"img":"rulet_as"},{"id":"rulet_kur","n":"Рулет с курицей","d":"Яйцо, мука, морковь, курица, грибы, растительное масло","p":3500,"img":"rulet_kur"},{"id":"fish_as","n":"Ассорти из рыбы","d":"Сельдь, красная рыба, скумбрия, оливки, лимон","p":3200,"img":"fish_as"},{"id":"baklazhan","n":"Рулетики из баклажана","d":"«Тёщин язык», «павлиний хвост»","p":2500,"u":"12 шт","img":"baklazhan"},{"id":"lavash","n":"Лаваш с крабовыми палочками","d":"Лаваш, крабовые палочки, сыр, яйцо, зелень, майонез, чеснок","p":2500,"u":"12 шт","img":"lavash"},{"id":"buter","n":"Бутерброды ассорти","d":"Овощные","p":2500,"u":"12 шт","img":"buter"},{"id":"meshochki","n":"Блинные мешочки","d":"Блины, яйцо, крабовые палочки, огурец, майонез","p":2500,"u":"10 шт","img":"meshochki"},{"id":"furshet","n":"Тарталетки «Фуршетные»","d":"Курица, яйцо, морковь, шампиньоны, майонез, зелень","p":1500,"u":"12 шт","img":"furshet"},{"id":"tort_pechen","n":"Торт из печени","d":"Куриная печень, лук, чеснок, морковь, яйцо, грибы, сыр, маслины, зелень, майонез","p":4500,"img":"tort_pechen"},{"id":"tort_blin","n":"Торт блинный","d":"Говяжий фарш, блины, лук, яйцо, сыр, шампиньоны, майонез","p":3000,"img":"tort_blin"},{"id":"syr_myaso","n":"Сырное и мясное ассорти","p":4000,"img":"syr_myaso"},{"id":"frukty","n":"Фруктовая нарезка","p":4000,"img":"frukty"},{"id":"narezka_b","n":"Овощная нарезка","p":3000,"img":"narezka_b"}]},{"id":"salads","t":"Салаты","items":[{"id":"elochka","n":"Ёлочка","d":"Варёный картофель, кукуруза, яйцо, копчёная грудка, майонез, плавленый сыр, укроп, гранат, чипсы","p":null,"img":"elochka"},{"id":"alatau","n":"Алатау","d":"Солёные огурцы, сыр, помидоры, листья салата, курица, сыр чечил, майонез","p":null,"img":"alatau"},{"id":"gnezdo","n":"Гнездо глухаря","d":"Картофель соломкой, куриное мясо, красный лук, кукуруза, свежий огурец, яйцо, сыр, майонез","p":null,"img":"gnezdo"},{"id":"sinee_more","n":"У синего моря","d":"Морская капуста, тигровые креветки, крабовое мясо, яйца, грецкий орех, майонез, чеснок, лимон","p":null,"img":"sinee_more"},{"id":"shahinya","n":"Шахиня","d":"Ананас, варёная курица, чернослив, болгарский перец, майонез, миндаль","p":null,"img":"shahinya"},{"id":"kapriz","n":"Каприз","d":"Куриная печень, болгарский перец, огурец, морковь по-корейски, помидоры, стручковая фасоль, соевый соус","p":null,"img":"kapriz"},{"id":"tbilisi","n":"Тбилиси","d":"Кинза, чеснок, говядина, болгарский перец, грецкие орехи, растительное масло, маринованная фасоль","p":null,"img":"tbilisi"},{"id":"banketny","n":"Банкетный","d":"Говядина, солёные огурцы, маринованная фасоль, болгарский перец, помидоры, оливковое масло, соевый соус","p":null,"img":"banketny"},{"id":"budapesht","n":"Будапештский","d":"Говядина, грибы, солёные огурцы, болгарский перец, помидоры, маслины, лук, лимон, оливковое масло","p":null,"img":"budapesht"},{"id":"cezar","n":"Цезарь с курицей","d":"Куриное филе, помидоры, сыр, сухарики, майонез с чесноком","p":null,"img":"cezar"},{"id":"grecheskiy","n":"Греческий","d":"Болгарский перец, брынза, огурцы, помидоры, маслины, оливковое масло","p":null,"img":"grecheskiy"},{"id":"olivie","n":"Оливье","d":"Картофель, яйцо, копчёное мясо, свежие огурцы, зелёный горошек, майонез","p":null,"img":"olivie"},{"id":"morkov_he","n":"Морковь хе с мясом","p":null,"img":"morkov_he"},{"id":"muer","n":"Муэр","d":"Древесные грибы, курица, соевый соус","p":null,"img":"muer"},{"id":"vitamin","n":"Витаминный","d":"Свежая капуста, свёкла, болгарский перец, лук, чеснок, горошек, зелень, морковь по-корейски","p":null,"img":"vitamin"}]}]}];
+const TYPES = ['Свадьба', 'Қыз ұзату', 'Беташар', 'Құдалық', 'Тұсаукесер', 'Сүндет той', 'Юбилей', 'День рождения', 'Корпоратив', 'Поминальный обед (ас)', 'Другое'];
+const ST = { new: 'Новая', confirmed: 'Подтверждена', cancelled: 'Отменена' };
+const KIND = { banquet: 'Банкет', table: 'Столик' };
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => n || n === 0 ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸' : '—';
+const WD = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+const fd = d => { if (!d) return '—'; const [y, m, dd] = d.split('-'); const w = new Date(Date.UTC(+y, m - 1, +dd)).getUTCDay(); return `${dd}.${m}.${y}, ${WD[w]}`; };
+const kzToday = () => new Date(Date.now() + 5 * 3600e3).toISOString().slice(0, 10);
+const fts = t => { if (!t) return ''; const d = new Date(new Date(t).getTime() + 5 * 3600e3).toISOString(); return d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4) + ' ' + d.slice(11, 16); };
+const addDays = (d, n) => new Date(Date.parse(d + 'T00:00:00Z') + n * 864e5).toISOString().slice(0, 10);
+let TOKEN = '', REFRESH = '', EXP = 0, KEEP = true, TODAY = '', ALL = [], BLOCKED = [], calM = null, selDay = null;
+const store = { get: k => { try { return sessionStorage.getItem(k) || localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v, keep) => { try { sessionStorage.setItem(k, v); if (keep) localStorage.setItem(k, v); } catch (e) {} }, del: k => { try { sessionStorage.removeItem(k); localStorage.removeItem(k); } catch (e) {} } };
+let tT; const toast = t => { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => el.classList.remove('on'), 2800); };
+const netMsg = e => e && e.message === 'Failed to fetch' ? 'Нет связи с сервером — проверьте интернет' : (e && e.message) || 'Ошибка';
+
+/* ---------- вход (Supabase Auth) ---------- */
+async function auth(grant, body) {
+  const r = await fetch(`${SB}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(/invalid|credentials|grant/i.test(j.error_description || j.msg || j.error || '') ? 'Неверный пароль' : (j.error_description || j.msg || 'Не удалось войти'));
+  TOKEN = j.access_token; REFRESH = j.refresh_token; EXP = Date.now() + ((j.expires_in || 3600) - 60) * 1000;
+  store.set('tumar-admin-rt', REFRESH, KEEP);
+}
+async function rest(path, opt = {}, retry = true) {
+  if (REFRESH && Date.now() > EXP) { try { await auth('refresh_token', { refresh_token: REFRESH }); } catch (e) { logout(); throw new Error('Войдите заново'); } }
+  const r = await fetch(SB + '/rest/v1/' + path, { ...opt, headers: { apikey: KEY, Authorization: 'Bearer ' + TOKEN, 'Content-Type': 'application/json', ...(opt.headers || {}) } });
+  if (r.status === 401 && retry && REFRESH) { try { await auth('refresh_token', { refresh_token: REFRESH }); return rest(path, opt, false); } catch (e) { logout(); throw new Error('Войдите заново'); } }
+  const txt = await r.text(); let data = null; try { data = txt ? JSON.parse(txt) : null; } catch (e) { data = txt; }
+  if (!r.ok) { const e = new Error((data && (data.message || data.error)) || 'Ошибка ' + r.status); e.status = r.status; throw e; }
+  return data;
+}
+function enter() { TODAY = kzToday(); $('#login').hidden = true; $('#app').hidden = false; $('#todayTxt').textContent = 'сегодня ' + fd(TODAY); init(); }
+async function login() {
+  $('#loginErr').textContent = ''; KEEP = $('#remember').checked;
+  const email = CFG.email || $('#em').value.trim();
+  if (!email) { $('#loginErr').textContent = 'Укажите почту'; return; }
+  $('#loginBtn').disabled = true;
+  try { await auth('password', { email, password: $('#pw').value }); $('#pw').value = ''; enter(); }
+  catch (e) { $('#loginErr').textContent = netMsg(e); }
+  finally { $('#loginBtn').disabled = false; }
+}
+function logout() { store.del('tumar-admin-rt'); TOKEN = REFRESH = ''; EXP = 0; $('#app').hidden = true; $('#login').hidden = false; $('#saveBar').classList.remove('on'); }
+if (CFG.email) $('#em').hidden = true;
+$('#loginBtn').onclick = login;
+$('#pw').onkeydown = e => { if (e.key === 'Enter') login(); };
+$('#logout').onclick = () => { if (dirty && !confirm('Меню не сохранено. Всё равно выйти?')) return; logout(); };
+
+/* ---------- данные ---------- */
+async function load() {
+  const [b, bl] = await Promise.all([rest('bookings?select=*&order=event_date.asc,event_time.asc.nullsfirst,id.asc&limit=10000'), rest('blocked_dates?select=*&order=date.asc')]);
+  ALL = b || []; BLOCKED = bl || [];
+  $('#cntNew').textContent = ALL.filter(x => x.status === 'new').length;
+  renderList(); renderCal(); renderBlocked();
+}
+let inited = false;
+function init() {
+  if (!inited) {
+    inited = true;
+    $('#aType').innerHTML = TYPES.map(t => `<option>${t}</option>`).join('');
+    $('#aDate').min = $('#bDate').min = TODAY;
+  }
+  load().catch(e => toast(e.message));
+  loadMenu().catch(e => toast(e.message));
+  loadNotice().catch(() => {});
+}
+
+/* ---------- заявки ---------- */
+function card(b) {
+  const digits = (b.phone || '').replace(/\D/g, '');
+  const wa = `https://wa.me/${digits}?text=${encodeURIComponent(`Здравствуйте, ${b.name}! Это ресторан «Тумар». По вашей заявке №${b.id} на ${fd(b.event_date).split(',')[0]} (${b.guests} гостей): `)}`;
+  return `<article class="card ${b.status}" data-id="${b.id}">
+    <div class="ch"><div><span class="id"><span class="kind ${b.kind}">${KIND[b.kind] || 'Банкет'}</span>№${b.id} · ${b.source === 'admin' ? 'внесена вручную' : 'с сайта'}</span><h3>${fd(b.event_date)}${b.event_time ? ' · ' + esc(b.event_time) : ''}</h3></div><span class="st ${b.status}">${ST[b.status]}</span></div>
+    <div class="grid"><div><span>Гостей:</span> <b>${b.guests}</b></div>${b.kind !== 'table' ? `<div><span>Праздник:</span> ${esc(b.event_type || '—')}</div>` : ''}${b.preorder_total ? `<div><span>Заказ:</span> <b>${money(b.preorder_total)}</b></div>` : ''}</div>
+    ${b.comment ? `<div class="cm">${esc(b.comment)}</div>` : ''}
+    ${b.preorder ? `<details class="pre"><summary>Блюда, выбранные на сайте</summary><div>${esc(b.preorder)}</div></details>` : ''}
+    <div class="who"><b>${esc(b.name)}</b><a class="btn sm" href="tel:${esc(b.phone)}">📞 ${esc(b.phone)}</a><a class="btn sm wa" href="${wa}" target="_blank" rel="noopener">WhatsApp</a></div>
+    <textarea class="inp note" placeholder="Заметка администратора (видно только здесь)" data-note>${esc(b.admin_note || '')}</textarea>
+    <div class="acts">
+      ${b.status !== 'confirmed' ? '<button class="btn sm ok" data-st="confirmed">✓ Подтвердить</button>' : ''}
+      ${b.status !== 'cancelled' ? '<button class="btn sm no" data-st="cancelled">✕ Отменить</button>' : ''}
+      ${b.status !== 'new' ? '<button class="btn sm" data-st="new">↺ В новые</button>' : ''}
+      <button class="btn sm no" data-del style="margin-left:auto">Удалить</button>
+    </div>
+    <div class="meta">Создана ${fts(b.created_at)}${b.updated_at ? ' · изменена ' + fts(b.updated_at) : ''}</div>
+  </article>`;
+}
+function renderList() {
+  const st = $('#fStatus').value, kd = $('#fKind').value, q = $('#fQ').value.trim().toLowerCase(), fut = $('#fFuture').checked;
+  const rows = ALL.filter(b => (!st || b.status === st) && (!kd || b.kind === kd) && (!fut || b.event_date >= TODAY) && (!q || [b.name, b.phone, String(b.id), b.comment].some(x => (x || '').toLowerCase().includes(q))));
+  $('#list').innerHTML = rows.length ? rows.map(card).join('') : `<div class="empty">${st === 'new' ? 'Новых заявок нет 👌' : 'Ничего не найдено'}</div>`;
+}
+['#fStatus', '#fKind', '#fFuture'].forEach(s => $(s).onchange = renderList);
+$('#fQ').oninput = renderList;
+
+const dayTaken = (date, exceptId) => BLOCKED.some(x => x.date === date) || ALL.some(x => x.id != exceptId && x.status === 'confirmed' && x.kind === 'banquet' && x.event_date === date);
+async function setStatus(id, status, force) {
+  const cur = ALL.find(x => x.id == id);
+  if (status === 'confirmed' && cur && cur.kind === 'banquet' && !force && dayTaken(cur.event_date, id) && !confirm('На эту дату уже есть подтверждённый банкет или дата закрыта. Всё равно подтвердить?')) return;
+  try { await rest('bookings?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ status, updated_at: new Date().toISOString() }) }); const b = ALL.find(x => x.id == id); toast(status === 'confirmed' ? (b && b.kind === 'table' ? 'Столик подтверждён' : 'Подтверждено — дата на сайте теперь «занято»') : status === 'cancelled' ? 'Заявка отменена' : 'Возвращено в новые'); await load(); }
+  catch (e) { toast(netMsg(e)); }
+}
+document.addEventListener('click', async e => {
+  const c = e.target.closest('.card[data-id]');
+  const s = e.target.closest('[data-st]');
+  if (c && s) return setStatus(+c.dataset.id, s.dataset.st);
+  if (c && e.target.closest('[data-del]')) {
+    if (!confirm('Удалить заявку №' + c.dataset.id + ' навсегда?')) return;
+    try { await rest('bookings?id=eq.' + c.dataset.id, { method: 'DELETE' }); toast('Удалено'); load(); } catch (er) { toast(netMsg(er)); }
+  }
+  const t = e.target.closest('#tabs button');
+  if (t) { $$('#tabs button').forEach(x => x.classList.toggle('on', x === t)); $$('[data-view]').forEach(v => v.hidden = v.dataset.view !== t.dataset.tab); }
+  const d = e.target.closest('.dc[data-d]');
+  if (d) { selDay = d.dataset.d; renderCal(); }
+  const ub = e.target.closest('[data-unblock]');
+  if (ub) { try { await rest('blocked_dates?date=eq.' + ub.dataset.unblock, { method: 'DELETE' }); toast('Дата снова открыта'); load(); } catch (er) { toast(netMsg(er)); } }
+  const bb = e.target.closest('[data-blockday]');
+  if (bb) { try { await blockDate(bb.dataset.blockday, 'закрыта из календаря'); toast('Дата закрыта'); load(); } catch (er) { toast(netMsg(er)); } }
+});
+document.addEventListener('change', async e => {
+  const n = e.target.closest('[data-note]'); if (!n) return;
+  const id = n.closest('.card').dataset.id;
+  try { await rest('bookings?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ admin_note: n.value.trim().slice(0, 500) || null }) }); toast('Заметка сохранена'); const b = ALL.find(x => x.id == id); if (b) b.admin_note = n.value; } catch (er) { toast(netMsg(er)); }
+});
+
+/* ---------- календарь ---------- */
+function renderCal() {
+  if (!TODAY) return;
+  if (!calM) calM = TODAY.slice(0, 7);
+  const [y, m] = calM.split('-').map(Number);
+  $('#calTitle').textContent = new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric', timeZone: 'UTC' }).replace(/\s*г\.?$/, '');
+  const first = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7, days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const blocked = new Set(BLOCKED.map(b => b.date));
+  let h = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(w => `<div class="wd">${w}</div>`).join('') + '<div></div>'.repeat(first);
+  for (let d = 1; d <= days; d++) {
+    const ds = `${calM}-${String(d).padStart(2, '0')}`, bs = ALL.filter(b => b.event_date === ds);
+    const c = bs.filter(b => b.status === 'confirmed' && b.kind !== 'table').length, t = bs.filter(b => b.status === 'confirmed' && b.kind === 'table').length, n = bs.filter(b => b.status === 'new').length;
+    h += `<button class="dc${ds < TODAY ? ' past' : ''}${ds === TODAY ? ' today' : ''}${c ? ' conf' : ''}${blocked.has(ds) ? ' blk' : ''}${ds === selDay ? ' sel' : ''}" data-d="${ds}"><span class="n">${d}</span>${c ? `<i class="c">✓ банкет</i>` : ''}${t ? `<i class="t">столы ${t}</i>` : ''}${n ? `<i class="w">${n} нов.</i>` : ''}${blocked.has(ds) ? '<i class="x">закрыта</i>' : ''}</button>`;
+  }
+  $('#calGrid').innerHTML = h;
+  if (selDay) {
+    const bs = ALL.filter(b => b.event_date === selDay), isB = blocked.has(selDay);
+    $('#dayBox').innerHTML = `<div class="panel"><h2>${fd(selDay)}</h2><div class="acts">${isB ? `<button class="btn sm" data-unblock="${selDay}">Открыть дату</button>` : `<button class="btn sm" data-blockday="${selDay}">Закрыть дату</button>`}</div></div><div class="list" style="margin-top:12px">${bs.length ? bs.map(card).join('') : '<div class="empty">Заявок на этот день нет</div>'}</div>`;
+  } else $('#dayBox').innerHTML = '';
+}
+$('#calPrev').onclick = () => { const [y, m] = calM.split('-').map(Number); calM = new Date(Date.UTC(y, m - 2, 1)).toISOString().slice(0, 7); renderCal(); };
+$('#calNext').onclick = () => { const [y, m] = calM.split('-').map(Number); calM = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 7); renderCal(); };
+
+/* ---------- закрытые даты ---------- */
+function renderBlocked() {
+  $('#bList').innerHTML = BLOCKED.length ? BLOCKED.map(b => `<div><span><b>${fd(b.date)}</b>${b.reason ? ' — ' + esc(b.reason) : ''}</span><button class="btn sm" data-unblock="${b.date}">Открыть</button></div>`).join('') : '<div class="empty">Закрытых дат нет</div>';
+}
+$('#bSave').onclick = async () => {
+  if (!$('#bDate').value) return toast('Выберите дату');
+  try { await blockDate($('#bDate').value, $('#bReason').value); toast('Дата закрыта'); $('#bReason').value = ''; load(); } catch (e) { toast(netMsg(e)); }
+};
+
+const blockDate = (date, reason) => rest('blocked_dates?on_conflict=date', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ date, reason: String(reason || '').trim().slice(0, 200) || null }) });
+
+/* ---------- бронь вручную ---------- */
+$('#aKind').onchange = () => { const t = $('#aKind').value === 'table'; $('#aType').disabled = t; $('#aTime').value = t ? '13:00' : '18:00'; $('#aGuests').value = t ? 4 : 40; };
+async function saveManual() {
+  const kind = $('#aKind').value, date = $('#aDate').value, time = $('#aTime').value, guests = parseInt($('#aGuests').value, 10), name = $('#aName').value.trim(), status = $('#aStatus').value;
+  let digits = $('#aPhone').value.replace(/\D/g, '');
+  if (!date) return toast('Укажите дату');
+  if (!(guests >= 1 && guests <= 500)) return toast('Гостей — от 1 до 500');
+  if (name.length < 2) return toast('Укажите имя');
+  if (digits.length < 10 || digits.length > 15) return toast('Проверьте номер телефона');
+  if (digits.length === 10) digits = '7' + digits; if (digits.length === 11 && digits[0] === '8') digits = '7' + digits.slice(1);
+  if (status === 'confirmed' && kind === 'banquet' && dayTaken(date) && !confirm('На эту дату уже есть подтверждённый банкет или дата закрыта.\nВсё равно сохранить?')) return;
+  const body = { kind, event_date: date, event_time: time || null, guests, event_type: kind === 'table' ? 'Столик' : $('#aType').value, name, phone: '+' + digits, comment: $('#aCom').value.trim() || null, source: 'admin', status, updated_at: new Date().toISOString() };
+  try { const r = await rest('bookings', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(body) }); toast('Бронь №' + (r && r[0] ? r[0].id : '') + ' сохранена'); ['#aName', '#aPhone', '#aCom'].forEach(s => $(s).value = ''); load(); }
+  catch (e) { toast(netMsg(e)); }
+}
+$('#aSave').onclick = () => saveManual();
+
+/* ---------- меню ---------- */
+let MENU = null, SAVED = null, dirty = false, mSec = 0, fromServer = false;
+const clone = o => JSON.parse(JSON.stringify(o));
+async function loadMenu() {
+  const rows = await rest('settings?key=eq.menu&select=value,updated_at');
+  const r = rows && rows[0] && Array.isArray(rows[0].value) ? rows[0] : null;
+  fromServer = !!r;
+  SAVED = clone(r ? r.value : MENU_DEFAULT); MENU = clone(SAVED); setDirty(false);
+  $('#menuState').textContent = fromServer ? `Сейчас на сайте — ваша версия меню (сохранена ${fts(r.updated_at)}).` : 'Сейчас на сайте — исходное меню, которое было при создании сайта.';
+  renderMenu();
+}
+function setDirty(v) { dirty = v; $('#saveBar').classList.toggle('on', v); }
+function renderMenu() {
+  if (!MENU) return;
+  if (mSec >= MENU.length) mSec = 0;
+  $('#mSeg').innerHTML = MENU.map((s, i) => `<button type="button" class="${i === mSec ? 'on' : ''}" data-msec="${i}">${esc(s.title)}</button>`).join('');
+  const s = MENU[mSec], openCats = new Set($$('#mBody details[open]').map(d => d.dataset.c));
+  $('#mBody').innerHTML = s.cats.map((c, ci) => `<details class="mc" data-c="${ci}" ${openCats.has(String(ci)) || (!openCats.size && ci === 0) ? 'open' : ''}><summary>${esc(c.t)} <small>${c.items.length} блюд${c.items.some(i => i.off) ? ` · нет сегодня: ${c.items.filter(i => i.off).length}` : ''}</small></summary>
+    <div class="mcb">
+      <label class="f">Название раздела<input class="inp" data-cat="${ci}" value="${esc(c.t)}"></label>
+      ${c.items.map((it, ii) => `<div class="mi${it.off ? ' off' : ''}" data-c="${ci}" data-i="${ii}">
+        <input class="inp nm" data-f="n" value="${esc(it.n)}" placeholder="Название блюда" aria-label="Название">
+        <input class="inp pr" data-f="p" value="${it.p ?? ''}" inputmode="numeric" placeholder="по запросу" aria-label="Цена, ₸">
+        <input class="inp un" data-f="u" value="${esc(it.u || '')}" placeholder="порция" aria-label="Количество / на сколько человек">
+        <div class="tg">
+          <label class="pill offp"><input type="checkbox" data-f="off" ${it.off ? 'checked' : ''}>Нет сегодня</label>
+          <label class="pill hitp"><input type="checkbox" data-f="hit" ${it.hit ? 'checked' : ''}>Фирменное</label>
+          <button type="button" class="pill" data-desc>Состав${it.d ? ' ✓' : ''}</button>
+          ${it.img ? '' : '<span class="ph">без фото</span>'}
+          <button type="button" class="x" data-delitem>Удалить</button>
+        </div>
+        <textarea class="inp" data-f="d" placeholder="Состав или описание" ${it.d ? '' : 'hidden'}>${esc(it.d || '')}</textarea>
+      </div>`).join('')}
+      <div class="acts"><button type="button" class="btn sm" data-additem="${ci}">+ Добавить блюдо</button>${c.items.length ? '' : `<button type="button" class="btn sm no" data-delcat="${ci}">Удалить пустой раздел</button>`}</div>
+    </div></details>`).join('');
+}
+$('#mSeg').onclick = e => { const b = e.target.closest('[data-msec]'); if (!b) return; mSec = +b.dataset.msec; $('#mBody').innerHTML = ''; renderMenu(); };
+$('#mBody').addEventListener('input', e => {
+  const el = e.target, s = MENU[mSec];
+  if (el.dataset.cat !== undefined) { s.cats[+el.dataset.cat].t = el.value; el.closest('details').querySelector('summary').firstChild.textContent = el.value + ' '; setDirty(true); return; }
+  const row = el.closest('.mi'); if (!row || !el.dataset.f) return;
+  const it = s.cats[+row.dataset.c].items[+row.dataset.i], f = el.dataset.f;
+  if (f === 'p') { const v = el.value.replace(/\D/g, ''); if (v !== el.value) el.value = v; it.p = v === '' ? null : +v; }
+  else if (f === 'off' || f === 'hit') { if (el.checked) it[f] = true; else delete it[f]; if (f === 'off') row.classList.toggle('off', el.checked); }
+  else { if (el.value.trim()) it[f] = el.value; else delete it[f]; if (f === 'n') it.n = el.value; }
+  setDirty(true);
+});
+$('#mBody').addEventListener('click', e => {
+  const s = MENU[mSec];
+  const ds = e.target.closest('[data-desc]'); if (ds) { const ta = ds.closest('.mi').querySelector('textarea'); ta.hidden = !ta.hidden; if (!ta.hidden) ta.focus(); return; }
+  const di = e.target.closest('[data-delitem]'); if (di) { const row = di.closest('.mi'), c = s.cats[+row.dataset.c], it = c.items[+row.dataset.i]; if (!confirm(`Удалить «${it.n}» из меню?`)) return; c.items.splice(+row.dataset.i, 1); setDirty(true); renderMenu(); return; }
+  const ai = e.target.closest('[data-additem]'); if (ai) { const c = s.cats[+ai.dataset.additem]; c.items.push({ id: 'n' + Date.now().toString(36), n: '', p: null }); setDirty(true); renderMenu(); const rows = $$(`#mBody .mi[data-c="${ai.dataset.additem}"]`); rows[rows.length - 1].querySelector('.nm').focus(); return; }
+  const dc = e.target.closest('[data-delcat]'); if (dc) { s.cats.splice(+dc.dataset.delcat, 1); setDirty(true); $('#mBody').innerHTML = ''; renderMenu(); }
+});
+$('#mAddCat').onclick = () => { const t = prompt('Название нового раздела, например «Напитки»'); if (!t || !t.trim()) return; MENU[mSec].cats.push({ id: 'c' + Date.now().toString(36), t: t.trim(), items: [] }); setDirty(true); renderMenu(); const ds = $$('#mBody details'); ds[ds.length - 1].open = true; ds[ds.length - 1].scrollIntoView({ behavior: 'smooth' }); };
+$('#mUndo').onclick = () => { if (!confirm('Отменить все несохранённые правки меню?')) return; MENU = clone(SAVED); setDirty(false); $('#mBody').innerHTML = ''; renderMenu(); };
+$('#mSave').onclick = async () => {
+  const empty = MENU.flatMap(s => s.cats.flatMap(c => c.items)).find(i => !String(i.n || '').trim());
+  if (empty) return toast('У одного из блюд пустое название — заполните или удалите его');
+  const b = $('#mSave'); b.disabled = true;
+  try { const menu = cleanMenu(MENU); await rest('settings?on_conflict=key', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ key: 'menu', value: menu, updated_at: new Date().toISOString() }) }); SAVED = clone(menu); MENU = clone(menu); fromServer = true; setDirty(false); $('#menuState').textContent = 'Сейчас на сайте — ваша версия меню (сохранена только что).'; renderMenu(); toast('Меню сохранено — сайт уже обновился'); }
+  catch (e) { toast(netMsg(e)); } finally { b.disabled = false; }
+};
+$('#mReset').onclick = async () => {
+  if (!confirm('Вернуть на сайт исходное меню? Все ваши правки цен и блюд пропадут.')) return;
+  try { await rest('settings?key=eq.menu', { method: 'DELETE' }); toast('Исходное меню восстановлено'); $('#mBody').innerHTML = ''; await loadMenu(); } catch (e) { toast(netMsg(e)); }
+};
+function cleanMenu(m) {
+  const cl = (v, n) => String(v ?? '').replace(/[\u0000-\u0008\u000b-\u001f]/g, '').trim().slice(0, n);
+  const ids = new Set(); let total = 0;
+  return m.map((s, si) => ({ id: cl(s.id, 40) || 'sec' + si, title: cl(s.title, 80) || 'Меню', note: cl(s.note, 400),
+    cats: s.cats.map((c, ci) => ({ id: cl(c.id, 40) || `c${si}_${ci}`, t: cl(c.t, 80) || 'Раздел',
+      items: c.items.map(it => {
+        total++; let id = cl(it.id, 60).replace(/[^\w-]/g, '') || 'x' + total; while (ids.has(id)) id += '_'; ids.add(id);
+        const p = it.p === null || it.p === undefined || it.p === '' ? null : Math.round(Number(it.p));
+        if (p !== null && !(p >= 0 && p <= 10000000)) throw new Error('Проверьте цену: ' + cl(it.n, 60));
+        const o = { id, n: cl(it.n, 120), p };
+        if (!o.n) throw new Error('У одного из блюд пустое название');
+        const d = cl(it.d, 600), u = cl(it.u, 40), img = cl(it.img, 40);
+        if (d) o.d = d; if (u) o.u = u; if (img && /^[a-z0-9_]+$/.test(img)) o.img = img; if (it.hit) o.hit = true; if (it.off) o.off = true;
+        return o;
+      }) })) }));
+}
+addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+/* ---------- объявление ---------- */
+function prevNotice() { const t = $('#nText').value.trim(); $('#nPrev').textContent = t; $('#nPrev').hidden = !t || !$('#nOn').checked; }
+async function loadNotice() { const rows = await rest('settings?key=eq.notice&select=value'); const n = (rows && rows[0] && rows[0].value) || {}; $('#nText').value = n.text || ''; $('#nOn').checked = !!n.on; prevNotice(); }
+$('#nText').oninput = prevNotice; $('#nOn').onchange = prevNotice;
+$('#nSave').onclick = async () => {
+  try { await rest('settings?on_conflict=key', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ key: 'notice', value: { on: $('#nOn').checked, text: $('#nText').value.trim().slice(0, 300) }, updated_at: new Date().toISOString() }) }); toast($('#nOn').checked && $('#nText').value.trim() ? 'Объявление показано на сайте' : 'Объявление скрыто'); } catch (e) { toast(netMsg(e)); }
+};
+
+/* ---------- прочее ---------- */
+$('#reload').onclick = () => load().then(() => toast('Обновлено')).catch(e => toast(netMsg(e)));
+$('#csv').onclick = () => {
+  const cols = ['id', 'created_at', 'kind', 'event_date', 'event_time', 'guests', 'event_type', 'name', 'phone', 'comment', 'preorder', 'preorder_total', 'source', 'status', 'admin_note'];
+  const head = ['№', 'Создана', 'Тип', 'Дата', 'Время', 'Гостей', 'Праздник', 'Имя', 'Телефон', 'Комментарий', 'Заказ к столу', 'Сумма заказа', 'Источник', 'Статус', 'Заметка'];
+  const cell = (v, c) => { let x = v == null ? '' : String(v); if (c === 'kind') x = KIND[x] || x; if (c === 'status') x = ST[x] || x; if (c === 'created_at') x = fts(v); return /[";\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+  const csv = '\ufeff' + [head.join(';'), ...ALL.map(r => cols.map(c => cell(r[c], c)).join(';'))].join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = `tumar-zayavki-${TODAY}.csv`; document.body.appendChild(a); a.click(); a.remove();
+};
+setInterval(() => { if (TOKEN && !document.hidden) load().catch(() => {}); }, 60000);
+(async () => {
+  if (!SB || !KEY) { $('#login').hidden = false; $('#loginErr').textContent = 'Админка ещё не подключена к базе'; return; }
+  const rt = store.get('tumar-admin-rt');
+  if (rt) { try { KEEP = true; await auth('refresh_token', { refresh_token: rt }); enter(); return; } catch (e) { store.del('tumar-admin-rt'); } }
+  $('#login').hidden = false;
+})();
+</script>
+</body>
+</html>
