@@ -44,13 +44,13 @@ alter table blocked_dates enable row level security;
 alter table settings      enable row level security;
 
 drop policy if exists "admin all" on bookings;
-create policy "admin all" on bookings for all to authenticated using (true) with check (true);
+create policy "admin all" on bookings for all to authenticated using (auth.jwt()->>'email' = 'admin@tumar.kz') with check (auth.jwt()->>'email' = 'admin@tumar.kz');
 drop policy if exists "admin all" on blocked_dates;
-create policy "admin all" on blocked_dates for all to authenticated using (true) with check (true);
+create policy "admin all" on blocked_dates for all to authenticated using (auth.jwt()->>'email' = 'admin@tumar.kz') with check (auth.jwt()->>'email' = 'admin@tumar.kz');
 drop policy if exists "read all" on settings;
 create policy "read all" on settings for select using (true);
 drop policy if exists "admin write" on settings;
-create policy "admin write" on settings for all to authenticated using (true) with check (true);
+create policy "admin write" on settings for all to authenticated using (auth.jwt()->>'email' = 'admin@tumar.kz') with check (auth.jwt()->>'email' = 'admin@tumar.kz');
 
 -- Сегодня по времени Казахстана (UTC+5)
 create or replace function kz_today() returns date

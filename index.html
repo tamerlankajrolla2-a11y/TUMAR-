@@ -704,8 +704,8 @@ textarea.inp{min-height:84px;resize:vertical}
 
 /* ===== НАСТРОЙКИ ===== */
 const CFG = {
-  sbUrl: "",                       // Supabase → Project URL, например 'https://xxxx.supabase.co'
-  sbKey: "",                       // Supabase → anon / publishable key (публичный, его можно держать в коде)
+  sbUrl: "https://kdxkvoiswzhyfxkemjyc.supabase.co",                       // Supabase → Project URL, например 'https://xxxx.supabase.co'
+  sbKey: "sb_publishable_d4OWhl8Oihhf3IF-WTcc1w_2PhglK0P",                       // Supabase → anon / publishable key (публичный, его можно держать в коде)
   wa: '77775958796',               // WhatsApp администратора (только цифры, с 7 в начале)
   phone: '+77083640133',
   phoneTxt: '+7 708 364 01 33',
@@ -743,7 +743,7 @@ const MON = ['января', 'февраля', 'марта', 'апреля', 'м
 const dLong = d => { const [y, m, dd] = d.split('-').map(Number); const w = new Date(Date.UTC(y, m - 1, dd)).getUTCDay(); return `${dd} ${MON[m - 1]}, ${WD[w]}`; };
 const dShort = d => { const [y, m, dd] = d.split('-'); const w = new Date(Date.UTC(+y, m - 1, +dd)).getUTCDay(); return `${dd}.${m} (${WD[w]})`; };
 const SB = (CFG.sbUrl || '').replace(/\/+$/, '');
-const sb = (path, body) => fetch(`${SB}/rest/v1/${path}`, { method: body ? 'POST' : 'GET', cache: 'no-store', headers: { apikey: CFG.sbKey, Authorization: 'Bearer ' + CFG.sbKey, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined })
+const sb = (path, body) => fetch(`${SB}/rest/v1/${path}`, { method: body ? 'POST' : 'GET', cache: 'no-store', headers: { apikey: CFG.sbKey, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined })
   .then(async r => { const j = await r.json().catch(() => null); if (!r.ok) throw new Error((j && j.message) || 'HTTP ' + r.status); return j; });
 const waLink = text => `https://wa.me/${CFG.wa}?text=${encodeURIComponent(text)}`;
 let tT; const toast = t => { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => el.classList.remove('on'), 3200); };
