@@ -4,4 +4,4 @@
 
 - `index.html`, `img/`, `fonts/` — сайт (GitHub Pages)
 - `admin.html` — админка (заявки, календарь, меню и цены, объявление)
-- `server/supabase.sql` — база в Supabase. Как подключить — `server/ИНСТРУКЦИЯ.txt`
+- `server/worker.js` — сервер заявок, календаря и меню (Cloudflare Worker + D1). Подробнее — `server/ИНСТРУКЦИЯ.txt`

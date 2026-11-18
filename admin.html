@@ -225,14 +225,20 @@ label.f{display:grid;gap:5px;font-size:13px;font-weight:600;color:var(--mut)}
       <div class="prev" id="nPrev" hidden></div>
       <button class="btn gold" id="nSave">Сохранить объявление</button>
     </div>
+    <div class="panel" style="margin-top:14px">
+      <h2>Пароль администратора</h2>
+      <p class="h">Новый пароль — от 6 знаков. Запишите его в надёжном месте.</p>
+      <label class="f">Новый пароль<input class="inp" id="npw" type="password" autocomplete="new-password" maxlength="64"></label>
+      <button class="btn gold" id="npSave">Сменить пароль</button>
+    </div>
   </section>
 </div>
 <div class="savebar" id="saveBar"><span>Есть правки</span><button class="btn sm" id="mUndo">Отменить</button><button class="btn gold" id="mSave">Сохранить</button></div>
 <div class="toast" id="toast"></div>
 
 <script>
-const CFG = { sbUrl: "https://kdxkvoiswzhyfxkemjyc.supabase.co", sbKey: "sb_publishable_d4OWhl8Oihhf3IF-WTcc1w_2PhglK0P", email: "admin@tumar.kz" };
-const SB = CFG.sbUrl.replace(/\/+$/, ''), KEY = CFG.sbKey;
+const CFG = { api: "https://tumar-api.tamerlankajrolla2.workers.dev" };
+const API = CFG.api.replace(/\/+$/, '');
 const MENU_DEFAULT = [{"id":"cafe","title":"Кафе — каждый день","note":"Горячие обеды, выпечка, пицца и суши. Можно поесть в зале или взять с собой.","cats":[{"id":"soup","t":"Первые блюда","items":[{"id":"borsch","n":"Борщ","p":800,"img":"borsch"},{"id":"pelmeni","n":"Пельмени с бульоном","p":800,"img":"pelmeni"},{"id":"solyanka","n":"Солянка мясная сборная","p":750,"img":"solyanka"},{"id":"lapsha","n":"Лапша домашняя","p":500,"img":"lapsha"},{"id":"rassolnik","n":"Рассольник","p":500,"img":"rassolnik"}]},{"id":"main","t":"Вторые блюда","items":[{"id":"thai","n":"Мясо по-тайски","p":2000,"img":"thai"},{"id":"lagman","n":"Лагман","p":1500,"img":"lagman"},{"id":"plov","n":"Плов","p":1300,"img":"plov"},{"id":"manty","n":"Манты","p":1500,"img":"manty"},{"id":"kotleta","n":"Котлета домашняя с гарниром","p":1500,"img":"kotleta"},{"id":"gulyash","n":"Гуляш с гарниром","p":1500,"img":"gulyash"}]},{"id":"salad","t":"Салаты","items":[{"id":"meri","n":"Мери","p":700,"img":"meri"},{"id":"morkov","n":"Морковь по-корейски","p":700,"u":"150 г","img":"morkov"},{"id":"ovoshnoy","n":"Овощной","p":700,"img":"ovoshnoy"},{"id":"narezka_c","n":"Овощная нарезка","p":700,"img":"narezka_c"}]},{"id":"bake","t":"Выпечка","items":[{"id":"samsa","n":"Самса","p":400,"img":"samsa","hit":true},{"id":"belyash","n":"Беляш","p":400,"img":"belyash"},{"id":"cheburek","n":"Чебурек","p":400,"img":"cheburek"},{"id":"sosiska","n":"Сосиска в тесте","p":350,"img":"sosiska"},{"id":"hotdog","n":"Хот-дог","p":300,"img":"hotdog"},{"id":"kurnik","n":"Курник","p":300,"img":"kurnik"},{"id":"pirog","n":"Пирог творожный","p":600,"u":"кусок","img":"pirog"},{"id":"bliny","n":"Блины со сгущёнкой","p":500,"u":"2 шт","img":"bliny"},{"id":"hleb","n":"Хлеб","p":30,"u":"1 шт","img":"hleb"}]},{"id":"pizza","t":"Пицца","items":[{"id":"pizza_slice","n":"Пицца кусочком","p":400,"u":"кусок","img":"pizza_slice"},{"id":"pz_assorti","n":"Пицца «Ассорти»","p":3600,"img":"pz_assorti"},{"id":"pz_chicken","n":"Пицца «Курица с сыром»","p":3500,"img":"pz_chicken"},{"id":"pz_kolbasa","n":"Пицца «С колбасой»","p":3500,"img":"pz_kolbasa"}]},{"id":"sushi","t":"Суши","items":[{"id":"philadelphia","n":"Филадельфия","p":4000,"img":"philadelphia"},{"id":"california","n":"Калифорния","p":3500,"img":"california"},{"id":"sake","n":"Сяке-маки","p":3500,"img":"sake"}]},{"id":"grill","t":"Шашлык и донер","items":[{"id":"okorochka","n":"Шашлык из окорочка","p":1700,"img":"okorochka"},{"id":"doner_beef","n":"Донер с говядиной","p":1200,"img":"doner_beef","hit":true},{"id":"doner","n":"Донер","p":1300,"img":"doner"},{"id":"fries","n":"Картошка фри","p":800,"u":"150 г","img":"fries"}]}]},{"id":"banket","title":"Банкетное меню","note":"Для тоев, юбилеев и праздников. Цена указана за блюдо; у некоторых блюд — на сколько человек. Где цены нет, её скажет администратор.","cats":[{"id":"hot","t":"Горячее","items":[{"id":"tumar","n":"Тумар","d":"Фирменное блюдо: запечённый картофель, жареные манты, рис, ризотто, говядина в специальном соусе и овощи","p":35000,"u":"на 12 человек","img":"tumar","hit":true},{"id":"beshbarmak","n":"Бешпармак с особым приготовлением","p":48000,"u":"на 12 человек","img":"beshbarmak","hit":true},{"id":"shashlyk_as","n":"Шашлычное ассорти и люля-кебаб","d":"Баранина — рёбра, говядина — филе, курица — крылышки; люля-кебаб, огурцы, помидоры, маринованный лук, запечённый картофель","p":22000,"u":"на 12 человек","img":"shashlyk_as","hit":true},{"id":"sirne","n":"Сірне","d":"Мясо с овощами: картофель, морковь, лук, болгарский перец, манты-розочки","p":null,"img":"sirne","hit":true},{"id":"karp","n":"Карп фаршированный запечённый","d":"С овощами","p":15000,"u":"на 10 человек","img":"karp"},{"id":"kur_as","n":"Куриное ассорти","d":"Голень, крылья, бедро","p":8000,"u":"на 12 человек","img":"kur_as"},{"id":"utka","n":"Утка жареная","d":"Овощи, зелень","p":null,"img":"utka"},{"id":"gus","n":"Гусь по-королевски","d":"С запечёнными овощами и фруктами на гриле, хрустящими картофельными шариками (брокколи, баклажан, груша, яблоко)","p":null,"img":"gus"},{"id":"rebra","n":"Тушёные рёбра в винном соусе","d":"Со стейками-медальонами, запечёнными картофельными дольками и овощами на гриле (цукини, перец, помидор, кабачок)","p":3500,"u":"порция","img":"rebra"},{"id":"sudak","n":"Судак запечённый в сливочно-чесночном соусе","d":"С грибами на гриле и тушёными овощами (морковь, лук, стручковая фасоль)","p":3500,"u":"порция","img":"sudak"},{"id":"red_fish","n":"Стейк из красной рыбы","p":4500,"img":"red_fish"},{"id":"morskoy","n":"Морской язык с овощами в духовке","p":null,"img":"morskoy"},{"id":"kur_file","n":"Куриное филе, фаршированное овощами","d":"Рулетики","p":4500,"img":"kur_file"},{"id":"otbivnoe","n":"Мясо отбивное с овощами и гарниром","p":3500,"img":"otbivnoe"},{"id":"steak","n":"Стейк из свинины","d":"Запечённый с овощами и картофелем","p":3500,"img":"steak"},{"id":"thai_b","n":"Мясо по-тайски","d":"Говядина, солёные огурцы, лук, морковь, болгарский перец, соевый соус","p":2500,"img":"thai_b"},{"id":"damlyama","n":"Дамляма","d":"Говяжьи рёбра, помидоры, капуста, болгарский перец, лук, морковь","p":2500,"img":"damlyama"},{"id":"zapekanka","n":"Запеканка с отбивным мясом и овощами","d":"Картошка, морковь, грибы, лук, майонез, сыр","p":2500,"u":"порция","img":"zapekanka"},{"id":"gusarchiki","n":"Гусарчики","d":"Котлета, картофельное пюре, грибы, овощи, сыр","p":null,"img":"gusarchiki"},{"id":"hinkali","n":"Хинкали на дрожжевом тесте","d":"Фарш, зелень, чеснок, лук","p":null,"img":"hinkali"},{"id":"manty_b","n":"Манты","p":null,"u":"за 1 шт","img":"manty_b"},{"id":"golubcy","n":"Голубцы","p":500,"u":"1 шт","img":"golubcy"},{"id":"shnicel","n":"Куриные шницели в панировке","p":null,"img":"shnicel"}]},{"id":"cold","t":"Холодные закуски","items":[{"id":"rulet_as","n":"Ассорти рулетов","d":"Рулет яичный (яйцо, мясной фарш), рулет морковный (морковь, майонез, плавленый сыр)","p":4500,"img":"rulet_as"},{"id":"rulet_kur","n":"Рулет с курицей","d":"Яйцо, мука, морковь, курица, грибы, растительное масло","p":3500,"img":"rulet_kur"},{"id":"fish_as","n":"Ассорти из рыбы","d":"Сельдь, красная рыба, скумбрия, оливки, лимон","p":3200,"img":"fish_as"},{"id":"baklazhan","n":"Рулетики из баклажана","d":"«Тёщин язык», «павлиний хвост»","p":2500,"u":"12 шт","img":"baklazhan"},{"id":"lavash","n":"Лаваш с крабовыми палочками","d":"Лаваш, крабовые палочки, сыр, яйцо, зелень, майонез, чеснок","p":2500,"u":"12 шт","img":"lavash"},{"id":"buter","n":"Бутерброды ассорти","d":"Овощные","p":2500,"u":"12 шт","img":"buter"},{"id":"meshochki","n":"Блинные мешочки","d":"Блины, яйцо, крабовые палочки, огурец, майонез","p":2500,"u":"10 шт","img":"meshochki"},{"id":"furshet","n":"Тарталетки «Фуршетные»","d":"Курица, яйцо, морковь, шампиньоны, майонез, зелень","p":1500,"u":"12 шт","img":"furshet"},{"id":"tort_pechen","n":"Торт из печени","d":"Куриная печень, лук, чеснок, морковь, яйцо, грибы, сыр, маслины, зелень, майонез","p":4500,"img":"tort_pechen"},{"id":"tort_blin","n":"Торт блинный","d":"Говяжий фарш, блины, лук, яйцо, сыр, шампиньоны, майонез","p":3000,"img":"tort_blin"},{"id":"syr_myaso","n":"Сырное и мясное ассорти","p":4000,"img":"syr_myaso"},{"id":"frukty","n":"Фруктовая нарезка","p":4000,"img":"frukty"},{"id":"narezka_b","n":"Овощная нарезка","p":3000,"img":"narezka_b"}]},{"id":"salads","t":"Салаты","items":[{"id":"elochka","n":"Ёлочка","d":"Варёный картофель, кукуруза, яйцо, копчёная грудка, майонез, плавленый сыр, укроп, гранат, чипсы","p":null,"img":"elochka"},{"id":"alatau","n":"Алатау","d":"Солёные огурцы, сыр, помидоры, листья салата, курица, сыр чечил, майонез","p":null,"img":"alatau"},{"id":"gnezdo","n":"Гнездо глухаря","d":"Картофель соломкой, куриное мясо, красный лук, кукуруза, свежий огурец, яйцо, сыр, майонез","p":null,"img":"gnezdo"},{"id":"sinee_more","n":"У синего моря","d":"Морская капуста, тигровые креветки, крабовое мясо, яйца, грецкий орех, майонез, чеснок, лимон","p":null,"img":"sinee_more"},{"id":"shahinya","n":"Шахиня","d":"Ананас, варёная курица, чернослив, болгарский перец, майонез, миндаль","p":null,"img":"shahinya"},{"id":"kapriz","n":"Каприз","d":"Куриная печень, болгарский перец, огурец, морковь по-корейски, помидоры, стручковая фасоль, соевый соус","p":null,"img":"kapriz"},{"id":"tbilisi","n":"Тбилиси","d":"Кинза, чеснок, говядина, болгарский перец, грецкие орехи, растительное масло, маринованная фасоль","p":null,"img":"tbilisi"},{"id":"banketny","n":"Банкетный","d":"Говядина, солёные огурцы, маринованная фасоль, болгарский перец, помидоры, оливковое масло, соевый соус","p":null,"img":"banketny"},{"id":"budapesht","n":"Будапештский","d":"Говядина, грибы, солёные огурцы, болгарский перец, помидоры, маслины, лук, лимон, оливковое масло","p":null,"img":"budapesht"},{"id":"cezar","n":"Цезарь с курицей","d":"Куриное филе, помидоры, сыр, сухарики, майонез с чесноком","p":null,"img":"cezar"},{"id":"grecheskiy","n":"Греческий","d":"Болгарский перец, брынза, огурцы, помидоры, маслины, оливковое масло","p":null,"img":"grecheskiy"},{"id":"olivie","n":"Оливье","d":"Картофель, яйцо, копчёное мясо, свежие огурцы, зелёный горошек, майонез","p":null,"img":"olivie"},{"id":"morkov_he","n":"Морковь хе с мясом","p":null,"img":"morkov_he"},{"id":"muer","n":"Муэр","d":"Древесные грибы, курица, соевый соус","p":null,"img":"muer"},{"id":"vitamin","n":"Витаминный","d":"Свежая капуста, свёкла, болгарский перец, лук, чеснок, горошек, зелень, морковь по-корейски","p":null,"img":"vitamin"}]}]}];
 const TYPES = ['Свадьба', 'Қыз ұзату', 'Беташар', 'Құдалық', 'Тұсаукесер', 'Сүндет той', 'Юбилей', 'День рождения', 'Корпоратив', 'Поминальный обед (ас)', 'Другое'];
 const ST = { new: 'Новая', confirmed: 'Подтверждена', cancelled: 'Отменена' };
@@ -245,46 +251,46 @@ const fd = d => { if (!d) return '—'; const [y, m, dd] = d.split('-'); const w
 const kzToday = () => new Date(Date.now() + 5 * 3600e3).toISOString().slice(0, 10);
 const fts = t => { if (!t) return ''; const d = new Date(new Date(t).getTime() + 5 * 3600e3).toISOString(); return d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4) + ' ' + d.slice(11, 16); };
 const addDays = (d, n) => new Date(Date.parse(d + 'T00:00:00Z') + n * 864e5).toISOString().slice(0, 10);
-let TOKEN = '', REFRESH = '', EXP = 0, KEEP = true, TODAY = '', ALL = [], BLOCKED = [], calM = null, selDay = null;
+let TOKEN = '', EXP = 0, KEEP = true, TODAY = '', ALL = [], BLOCKED = [], calM = null, selDay = null;
 const store = { get: k => { try { return sessionStorage.getItem(k) || localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v, keep) => { try { sessionStorage.setItem(k, v); if (keep) localStorage.setItem(k, v); } catch (e) {} }, del: k => { try { sessionStorage.removeItem(k); localStorage.removeItem(k); } catch (e) {} } };
 let tT; const toast = t => { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => el.classList.remove('on'), 2800); };
 const netMsg = e => e && e.message === 'Failed to fetch' ? 'Нет связи с сервером — проверьте интернет' : (e && e.message) || 'Ошибка';
 
-/* ---------- вход (Supabase Auth) ---------- */
-async function auth(grant, body) {
-  const r = await fetch(`${SB}/auth/v1/token?grant_type=${grant}`, { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(/invalid|credentials|grant/i.test(j.error_description || j.msg || j.error || '') ? 'Неверный пароль' : (j.error_description || j.msg || 'Не удалось войти'));
-  TOKEN = j.access_token; REFRESH = j.refresh_token; EXP = Date.now() + ((j.expires_in || 3600) - 60) * 1000;
-  store.set('tumar-admin-rt', REFRESH, KEEP);
-}
-async function rest(path, opt = {}, retry = true) {
-  if (REFRESH && Date.now() > EXP) { try { await auth('refresh_token', { refresh_token: REFRESH }); } catch (e) { logout(); throw new Error('Войдите заново'); } }
-  const r = await fetch(SB + '/rest/v1/' + path, { ...opt, headers: { apikey: KEY, Authorization: 'Bearer ' + TOKEN, 'Content-Type': 'application/json', ...(opt.headers || {}) } });
-  if (r.status === 401 && retry && REFRESH) { try { await auth('refresh_token', { refresh_token: REFRESH }); return rest(path, opt, false); } catch (e) { logout(); throw new Error('Войдите заново'); } }
+/* ---------- вход (пароль → токен от сервера на Cloudflare) ---------- */
+async function api(path, opt = {}) {
+  const headers = { ...(opt.headers || {}) };
+  if (opt.body !== undefined) headers['Content-Type'] = 'application/json';
+  if (TOKEN) headers.Authorization = 'Bearer ' + TOKEN;
+  const r = await fetch(API + path, { method: opt.method || 'GET', cache: 'no-store', headers, body: opt.body });
   const txt = await r.text(); let data = null; try { data = txt ? JSON.parse(txt) : null; } catch (e) { data = txt; }
-  if (!r.ok) { const e = new Error((data && (data.message || data.error)) || 'Ошибка ' + r.status); e.status = r.status; throw e; }
+  if (r.status === 401 && TOKEN) { logout(); throw new Error('Войдите заново'); }
+  if (!r.ok) { const e = new Error((data && (data.error || data.message)) || 'Ошибка ' + r.status); e.status = r.status; throw e; }
   return data;
+}
+async function signIn(password) {
+  const j = await api('/login', { method: 'POST', body: JSON.stringify({ password }) });
+  TOKEN = j.token; EXP = j.exp;
+  store.set('tumar-admin-tk', TOKEN + '|' + EXP, KEEP);
 }
 function enter() { TODAY = kzToday(); $('#login').hidden = true; $('#app').hidden = false; $('#todayTxt').textContent = 'сегодня ' + fd(TODAY); init(); }
 async function login() {
   $('#loginErr').textContent = ''; KEEP = $('#remember').checked;
-  const email = CFG.email || $('#em').value.trim();
-  if (!email) { $('#loginErr').textContent = 'Укажите почту'; return; }
+  const pw = $('#pw').value;
+  if (!pw) { $('#loginErr').textContent = 'Введите пароль'; return; }
   $('#loginBtn').disabled = true;
-  try { await auth('password', { email, password: $('#pw').value }); $('#pw').value = ''; enter(); }
+  try { await signIn(pw); $('#pw').value = ''; enter(); }
   catch (e) { $('#loginErr').textContent = netMsg(e); }
   finally { $('#loginBtn').disabled = false; }
 }
-function logout() { store.del('tumar-admin-rt'); TOKEN = REFRESH = ''; EXP = 0; $('#app').hidden = true; $('#login').hidden = false; $('#saveBar').classList.remove('on'); }
-if (CFG.email) $('#em').hidden = true;
+function logout() { store.del('tumar-admin-tk'); TOKEN = ''; EXP = 0; $('#app').hidden = true; $('#login').hidden = false; $('#saveBar').classList.remove('on'); }
+$('#em').hidden = true;
 $('#loginBtn').onclick = login;
 $('#pw').onkeydown = e => { if (e.key === 'Enter') login(); };
 $('#logout').onclick = () => { if (dirty && !confirm('Меню не сохранено. Всё равно выйти?')) return; logout(); };
 
 /* ---------- данные ---------- */
 async function load() {
-  const [b, bl] = await Promise.all([rest('bookings?select=*&order=event_date.asc,event_time.asc.nullsfirst,id.asc&limit=10000'), rest('blocked_dates?select=*&order=date.asc')]);
+  const [b, bl] = await Promise.all([api('/bookings'), api('/blocked')]);
   ALL = b || []; BLOCKED = bl || [];
   $('#cntNew').textContent = ALL.filter(x => x.status === 'new').length;
   renderList(); renderCal(); renderBlocked();
@@ -333,7 +339,7 @@ const dayTaken = (date, exceptId) => BLOCKED.some(x => x.date === date) || ALL.s
 async function setStatus(id, status, force) {
   const cur = ALL.find(x => x.id == id);
   if (status === 'confirmed' && cur && cur.kind === 'banquet' && !force && dayTaken(cur.event_date, id) && !confirm('На эту дату уже есть подтверждённый банкет или дата закрыта. Всё равно подтвердить?')) return;
-  try { await rest('bookings?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ status, updated_at: new Date().toISOString() }) }); const b = ALL.find(x => x.id == id); toast(status === 'confirmed' ? (b && b.kind === 'table' ? 'Столик подтверждён' : 'Подтверждено — дата на сайте теперь «занято»') : status === 'cancelled' ? 'Заявка отменена' : 'Возвращено в новые'); await load(); }
+  try { await api('/bookings/' + id, { method: 'PATCH', body: JSON.stringify({ status }) }); const b = ALL.find(x => x.id == id); toast(status === 'confirmed' ? (b && b.kind === 'table' ? 'Столик подтверждён' : 'Подтверждено — дата на сайте теперь «занято»') : status === 'cancelled' ? 'Заявка отменена' : 'Возвращено в новые'); await load(); }
   catch (e) { toast(netMsg(e)); }
 }
 document.addEventListener('click', async e => {
@@ -342,21 +348,21 @@ document.addEventListener('click', async e => {
   if (c && s) return setStatus(+c.dataset.id, s.dataset.st);
   if (c && e.target.closest('[data-del]')) {
     if (!confirm('Удалить заявку №' + c.dataset.id + ' навсегда?')) return;
-    try { await rest('bookings?id=eq.' + c.dataset.id, { method: 'DELETE' }); toast('Удалено'); load(); } catch (er) { toast(netMsg(er)); }
+    try { await api('/bookings/' + c.dataset.id, { method: 'DELETE' }); toast('Удалено'); load(); } catch (er) { toast(netMsg(er)); }
   }
   const t = e.target.closest('#tabs button');
   if (t) { $$('#tabs button').forEach(x => x.classList.toggle('on', x === t)); $$('[data-view]').forEach(v => v.hidden = v.dataset.view !== t.dataset.tab); }
   const d = e.target.closest('.dc[data-d]');
   if (d) { selDay = d.dataset.d; renderCal(); }
   const ub = e.target.closest('[data-unblock]');
-  if (ub) { try { await rest('blocked_dates?date=eq.' + ub.dataset.unblock, { method: 'DELETE' }); toast('Дата снова открыта'); load(); } catch (er) { toast(netMsg(er)); } }
+  if (ub) { try { await api('/blocked/' + ub.dataset.unblock, { method: 'DELETE' }); toast('Дата снова открыта'); load(); } catch (er) { toast(netMsg(er)); } }
   const bb = e.target.closest('[data-blockday]');
   if (bb) { try { await blockDate(bb.dataset.blockday, 'закрыта из календаря'); toast('Дата закрыта'); load(); } catch (er) { toast(netMsg(er)); } }
 });
 document.addEventListener('change', async e => {
   const n = e.target.closest('[data-note]'); if (!n) return;
   const id = n.closest('.card').dataset.id;
-  try { await rest('bookings?id=eq.' + id, { method: 'PATCH', body: JSON.stringify({ admin_note: n.value.trim().slice(0, 500) || null }) }); toast('Заметка сохранена'); const b = ALL.find(x => x.id == id); if (b) b.admin_note = n.value; } catch (er) { toast(netMsg(er)); }
+  try { await api('/bookings/' + id, { method: 'PATCH', body: JSON.stringify({ admin_note: n.value.trim().slice(0, 500) || null }) }); toast('Заметка сохранена'); const b = ALL.find(x => x.id == id); if (b) b.admin_note = n.value; } catch (er) { toast(netMsg(er)); }
 });
 
 /* ---------- календарь ---------- */
@@ -391,7 +397,7 @@ $('#bSave').onclick = async () => {
   try { await blockDate($('#bDate').value, $('#bReason').value); toast('Дата закрыта'); $('#bReason').value = ''; load(); } catch (e) { toast(netMsg(e)); }
 };
 
-const blockDate = (date, reason) => rest('blocked_dates?on_conflict=date', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ date, reason: String(reason || '').trim().slice(0, 200) || null }) });
+const blockDate = (date, reason) => api('/blocked', { method: 'POST', body: JSON.stringify({ date, reason: String(reason || '').trim().slice(0, 200) || null }) });
 
 /* ---------- бронь вручную ---------- */
 $('#aKind').onchange = () => { const t = $('#aKind').value === 'table'; $('#aType').disabled = t; $('#aTime').value = t ? '13:00' : '18:00'; $('#aGuests').value = t ? 4 : 40; };
@@ -405,7 +411,7 @@ async function saveManual() {
   if (digits.length === 10) digits = '7' + digits; if (digits.length === 11 && digits[0] === '8') digits = '7' + digits.slice(1);
   if (status === 'confirmed' && kind === 'banquet' && dayTaken(date) && !confirm('На эту дату уже есть подтверждённый банкет или дата закрыта.\nВсё равно сохранить?')) return;
   const body = { kind, event_date: date, event_time: time || null, guests, event_type: kind === 'table' ? 'Столик' : $('#aType').value, name, phone: '+' + digits, comment: $('#aCom').value.trim() || null, source: 'admin', status, updated_at: new Date().toISOString() };
-  try { const r = await rest('bookings', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(body) }); toast('Бронь №' + (r && r[0] ? r[0].id : '') + ' сохранена'); ['#aName', '#aPhone', '#aCom'].forEach(s => $(s).value = ''); load(); }
+  try { const r = await api('/bookings', { method: 'POST', body: JSON.stringify(body) }); toast('Бронь №' + (r && r.id ? r.id : '') + ' сохранена'); ['#aName', '#aPhone', '#aCom'].forEach(s => $(s).value = ''); load(); }
   catch (e) { toast(netMsg(e)); }
 }
 $('#aSave').onclick = () => saveManual();
@@ -414,7 +420,7 @@ $('#aSave').onclick = () => saveManual();
 let MENU = null, SAVED = null, dirty = false, mSec = 0, fromServer = false;
 const clone = o => JSON.parse(JSON.stringify(o));
 async function loadMenu() {
-  const rows = await rest('settings?key=eq.menu&select=value,updated_at');
+  const rows = await api('/settings?keys=menu');
   const r = rows && rows[0] && Array.isArray(rows[0].value) ? rows[0] : null;
   fromServer = !!r;
   SAVED = clone(r ? r.value : MENU_DEFAULT); MENU = clone(SAVED); setDirty(false);
@@ -470,12 +476,12 @@ $('#mSave').onclick = async () => {
   const empty = MENU.flatMap(s => s.cats.flatMap(c => c.items)).find(i => !String(i.n || '').trim());
   if (empty) return toast('У одного из блюд пустое название — заполните или удалите его');
   const b = $('#mSave'); b.disabled = true;
-  try { const menu = cleanMenu(MENU); await rest('settings?on_conflict=key', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ key: 'menu', value: menu, updated_at: new Date().toISOString() }) }); SAVED = clone(menu); MENU = clone(menu); fromServer = true; setDirty(false); $('#menuState').textContent = 'Сейчас на сайте — ваша версия меню (сохранена только что).'; renderMenu(); toast('Меню сохранено — сайт уже обновился'); }
+  try { const menu = cleanMenu(MENU); await api('/settings/menu', { method: 'PUT', body: JSON.stringify(menu) }); SAVED = clone(menu); MENU = clone(menu); fromServer = true; setDirty(false); $('#menuState').textContent = 'Сейчас на сайте — ваша версия меню (сохранена только что).'; renderMenu(); toast('Меню сохранено — сайт уже обновился'); }
   catch (e) { toast(netMsg(e)); } finally { b.disabled = false; }
 };
 $('#mReset').onclick = async () => {
   if (!confirm('Вернуть на сайт исходное меню? Все ваши правки цен и блюд пропадут.')) return;
-  try { await rest('settings?key=eq.menu', { method: 'DELETE' }); toast('Исходное меню восстановлено'); $('#mBody').innerHTML = ''; await loadMenu(); } catch (e) { toast(netMsg(e)); }
+  try { await api('/settings/menu', { method: 'DELETE' }); toast('Исходное меню восстановлено'); $('#mBody').innerHTML = ''; await loadMenu(); } catch (e) { toast(netMsg(e)); }
 };
 function cleanMenu(m) {
   const cl = (v, n) => String(v ?? '').replace(/[\u0000-\u0008\u000b-\u001f]/g, '').trim().slice(0, n);
@@ -497,10 +503,16 @@ addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.retur
 
 /* ---------- объявление ---------- */
 function prevNotice() { const t = $('#nText').value.trim(); $('#nPrev').textContent = t; $('#nPrev').hidden = !t || !$('#nOn').checked; }
-async function loadNotice() { const rows = await rest('settings?key=eq.notice&select=value'); const n = (rows && rows[0] && rows[0].value) || {}; $('#nText').value = n.text || ''; $('#nOn').checked = !!n.on; prevNotice(); }
+async function loadNotice() { const rows = await api('/settings?keys=notice'); const n = (rows && rows[0] && rows[0].value) || {}; $('#nText').value = n.text || ''; $('#nOn').checked = !!n.on; prevNotice(); }
 $('#nText').oninput = prevNotice; $('#nOn').onchange = prevNotice;
 $('#nSave').onclick = async () => {
-  try { await rest('settings?on_conflict=key', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify({ key: 'notice', value: { on: $('#nOn').checked, text: $('#nText').value.trim().slice(0, 300) }, updated_at: new Date().toISOString() }) }); toast($('#nOn').checked && $('#nText').value.trim() ? 'Объявление показано на сайте' : 'Объявление скрыто'); } catch (e) { toast(netMsg(e)); }
+  try { await api('/settings/notice', { method: 'PUT', body: JSON.stringify({ on: $('#nOn').checked, text: $('#nText').value.trim().slice(0, 300) }) }); toast($('#nOn').checked && $('#nText').value.trim() ? 'Объявление показано на сайте' : 'Объявление скрыто'); } catch (e) { toast(netMsg(e)); }
+};
+
+$('#npSave').onclick = async () => {
+  const v = $('#npw').value;
+  if (v.length < 6) return toast('Пароль — от 6 знаков');
+  try { await api('/password', { method: 'POST', body: JSON.stringify({ password: v }) }); $('#npw').value = ''; toast('Пароль изменён'); } catch (e) { toast(netMsg(e)); }
 };
 
 /* ---------- прочее ---------- */
@@ -514,9 +526,12 @@ $('#csv').onclick = () => {
 };
 setInterval(() => { if (TOKEN && !document.hidden) load().catch(() => {}); }, 60000);
 (async () => {
-  if (!SB || !KEY) { $('#login').hidden = false; $('#loginErr').textContent = 'Админка ещё не подключена к базе'; return; }
-  const rt = store.get('tumar-admin-rt');
-  if (rt) { try { KEEP = true; await auth('refresh_token', { refresh_token: rt }); enter(); return; } catch (e) { store.del('tumar-admin-rt'); } }
+  const tk = store.get('tumar-admin-tk');
+  if (tk) {
+    const [t, e] = tk.split('|');
+    if (t && +e > Date.now()) { TOKEN = t; EXP = +e; KEEP = true; try { await api('/blocked'); enter(); return; } catch (er) { TOKEN = ''; } }
+    store.del('tumar-admin-tk');
+  }
   $('#login').hidden = false;
 })();
 </script>

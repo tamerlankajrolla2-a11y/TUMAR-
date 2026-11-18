@@ -1,39 +1,31 @@
-РЕСТОРАН «ТУМАР» — БАЗА И АДМИНКА НА SUPABASE
-=============================================
+РЕСТОРАН «ТУМАР» — СЕРВЕР НА CLOUDFLARE
+=======================================
 
 Сайт (index.html) и админка (admin.html) лежат на GitHub Pages.
-База и вход в админку — в Supabase (бесплатно). Отдельный сервер не нужен.
+Заявки, календарь, меню и вход в админку — на отдельном сервере в Cloudflare:
+Worker «tumar-api» + база D1 «tumar». Старый вариант на Supabase отключён
+(бесплатные проекты Supabase засыпают через 7 дней без запросов).
 
-1. ПРОЕКТ
-   supabase.com → New project → имя: tumar → пароль базы: «Сгенерировать»
-   (сохраните себе, никому не отправляйте) → регион Frankfurt → Create.
+Адрес сервера: https://tumar-api.tamerlankajrolla2.workers.dev
 
-2. БАЗА
-   Слева SQL Editor → New query → вставить весь текст supabase.sql → Run → «Success».
+ЧТО ГДЕ
+  server/worker.js — код сервера (в нём вместо хэша пароля стоит __ADMIN_HASH__)
+  Cloudflare → Workers & Pages → tumar-api → Settings → Bindings: DB = база «tumar»
+  Таблицы создаются сами при первом запросе: заявки, закрытые даты, меню/объявление.
 
-3. АДМИНИСТРАТОР
-   Authentication → Users → Add user → Create new user:
-     Email: любая почта (например, ваша)
-     Password: пароль от админки
-     галочка Auto Confirm User → Create user.
-   Затем Authentication → Sign In / Providers → выключить «Allow new users to sign up»
-   (чтобы посторонние не могли зарегистрироваться).
+ПАРОЛЬ АДМИНИСТРАТОРА
+  Вход только по паролю. Сменить можно в админке: вкладка «Объявление» → «Пароль администратора».
 
-4. КЛЮЧИ
-   Project Settings (шестерёнка) → API / API Keys:
-     Project URL  — https://xxxx.supabase.co
-     anon (publishable) key — длинная строка
-   Их можно вписывать в сайт: они публичные, защиту дают правила в базе.
-   service_role / secret key и пароль базы — НИКОМУ и никуда.
-
-5. ПОДКЛЮЧЕНИЕ
-   В index.html (блок «НАСТРОЙКИ») вписать sbUrl и sbKey,
-   в admin.html (строка const CFG) — sbUrl, sbKey и email администратора.
+ЕСЛИ СЕРВЕР НУЖНО ПЕРЕСОЗДАТЬ
+  1. Cloudflare → Storage & databases → D1 → Create → имя tumar.
+  2. Workers & Pages → Create → Hello World → имя tumar-api → Deploy → Edit code →
+     вставить server/worker.js, вместо __ADMIN_HASH__ — sha256 от «tumar:пароль» → Deploy.
+  3. Settings → Bindings → Add binding → D1 database → имя DB → база tumar.
+  4. В index.html и admin.html (блок «НАСТРОЙКИ» / const CFG) указать адрес Worker в api.
 
 АДМИНКА: https://tamerlankajrolla2-a11y.github.io/TUMAR-/admin.html
-Вход — только пароль. Что умеет:
   • Заявки с сайта (банкет / столик, блюда и сумма), подтвердить / отменить, заметки,
     кнопки «Позвонить» и WhatsApp. Подтверждённый банкет закрывает дату на сайте.
   • Календарь, «Закрыть дату», «Бронь вручную», выгрузка в Excel.
   • «Меню и цены»: цены, названия, новые блюда, «Нет сегодня», «Фирменное».
-  • «Объявление» — красная строка над сайтом.
+  • «Объявление» — красная строка над сайтом. Смена пароля.
